@@ -26,6 +26,8 @@ yarn build
 
 ### 发布 win 版到 github
 
+set NODE_OPTIONS=--openssl-legacy-provider
+
 yarn run electron:publish
 
 ### 项目地址
