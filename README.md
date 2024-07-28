@@ -2,11 +2,11 @@
 
 ### 环境配置
 
-1.安装nvm https://github.com/coreybutler/nvm-windows/releases
-2.nvm install 18.19.0
-3.nvm use 18.19.0
-4.npm install -g yarn
-5.yarn config set ignore-engines true
+- 安装nvm https://github.com/coreybutler/nvm-windows/releases
+- nvm install 18.19.0
+- nvm use 18.19.0
+- npm install -g yarn
+- yarn config set ignore-engines true
 
 ### 安装依赖
 
