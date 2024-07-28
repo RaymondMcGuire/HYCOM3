@@ -1,11 +1,19 @@
 <template>
   <div class="dashboard-editor-container">
-    <div class="hycom" />
+    <div
+      ref="hycom"
+      class="hycom"
+    >
+      <div class="mobile-overlay">
+        <h1>水力学计算程序</h1>
+        <p>欢迎使用HYCOM3</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { UserModule } from '@/store/modules/user'
 import { removeToken } from '@/utils/auth'
 
@@ -20,15 +28,15 @@ export default class DashboardEditor extends Vue {
       var u = window.navigator.userAgent
       var app = window.navigator.appVersion
       return {
-        trident: u.indexOf('Trident') > -1, // IE
-        presto: u.indexOf('Presto') > -1, // opera
-        webKit: u.indexOf('AppleWebKit') > -1, // apple google
-        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') === -1, // firefox
+        trident: u.indexOf('Trident') > -1,
+        presto: u.indexOf('Presto') > -1,
+        webKit: u.indexOf('AppleWebKit') > -1,
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') === -1,
         mobile: !!u.match(/AppleWebKit.*Mobile.*/),
-        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), // ios
-        android: u.indexOf('Android') > -1 || u.indexOf('Adr') > -1, // android
-        iPhone: u.indexOf('iPhone') > -1, // iPhone
-        iPad: u.indexOf('iPad') > -1, // iPad
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+        android: u.indexOf('Android') > -1 || u.indexOf('Adr') > -1,
+        iPhone: u.indexOf('iPhone') > -1,
+        iPad: u.indexOf('iPad') > -1,
         webApp: u.indexOf('Safari') === -1
       }
     })(),
@@ -36,77 +44,94 @@ export default class DashboardEditor extends Vue {
   };
 
   private dynamicResize() {
-    // init canvas height and width
-    $('.hycom').css({
-      height: $('.dashboard-editor-container').height() + 'px'
-    })
-    $('.hycom').css({ width: $('.dashboard-editor-container').width() + 'px' })
-  }
-
-  private addListener() {
-    $(window).resize(() => {
-      this.dynamicResize()
-    })
+    const hycomElement = this.$refs.hycom as HTMLElement
+    if (hycomElement) {
+      hycomElement.style.height = '100%'
+      hycomElement.style.width = '100%'
+    }
   }
 
   mounted() {
     this.dynamicResize()
-    this.addListener()
+    window.addEventListener('resize', this.dynamicResize)
     if (!this.browser.versions.iPhone && !this.browser.versions.android) {
       this.initRipple()
-    } else {
-      window.addEventListener('popstate', this.leaveHandler, false)
     }
   }
 
-  created() {
-    window.addEventListener('beforeunload', this.leaveHandler)
-  }
-
-  beforeDestroyed() {
-    window.removeEventListener('beforeunload', this.leaveHandler)
-  }
-
-  private leaveHandler(e: any) {
-    // e.preventDefault();
-    // e.returnValue = "";
-
-    UserModule.LogOut()
-    AV.User.logOut()
-    // location.reload();
+  beforeDestroy() {
+    window.removeEventListener('resize', this.dynamicResize)
   }
 
   private initRipple() {
-    let $hycom = $('.hycom')
-    $hycom.ripples({
-      resolution: 512,
-      dropRadius: 20,
-      perturbance: 0.02
-    })
+    const hycomElement = this.$refs.hycom as HTMLElement
+    if (hycomElement) {
+      $(hycomElement).ripples({
+        resolution: 512,
+        dropRadius: 20,
+        perturbance: 0.02
+      })
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.hycom {
-  display: block;
+.dashboard-editor-container {
+  height: 100%;
   width: 100%;
-  margin: 0 auto;
+  background-color: #afd5fb;
+  overflow: hidden;
+}
 
-  //phone
-  @media screen and (max-width: 768px) {
-    background: url("../../assets/images/HYCOM_2.0.png") no-repeat;
-    background-size: contain;
+.hycom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: background-image 0.3s ease-in-out;
+  background-image: url("../../assets/images/HYCOM_2.0.png");
+}
+
+.mobile-overlay {
+  display: none;
+  text-align: center;
+  color: white;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
   }
-  //pc
-  @media screen and (min-width: 768px) {
-    background: url("../../assets/images/HYCOM_2.0.png") center center no-repeat;
-    background-size: cover;
+
+  p {
+    font-size: 16px;
   }
 }
 
-.dashboard-editor-container {
-  background-color: #afd5fb;
-  min-height: 100vh;
+@media screen and (max-width: 768px) {
+  .hycom {
+    background-size: 150% auto;
+    background-position: center top;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+
+  .mobile-overlay {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .hycom {
+    background-size: 200% auto;
+  }
 }
 </style>

@@ -75,7 +75,7 @@ export default new Router({
     {
       path: '/section1',
       component: Layout,
-      redirect: '/section1/1.1',
+      redirect: '/dashboard',
       name: '溢洪道水力学计算',
       meta: { title: '溢洪道水力学计算', icon: 'nested' },
       children: [
@@ -230,7 +230,7 @@ export default new Router({
     {
       path: '/section2/2.2',
       component: Layout,
-      redirect: '/section2',
+      redirect: '/dashboard',
       name: '侧槽溢洪道水力学计算',
       meta: { title: '侧槽溢洪道水力学计算', icon: 'nested' },
       children: [
@@ -251,7 +251,7 @@ export default new Router({
     {
       path: '/section3',
       component: Layout,
-      redirect: '/section3',
+      redirect: '/dashboard',
       name: '水工隧洞水力学计算',
       meta: { title: '水工隧洞水力学计算', icon: 'nested' },
       children: [
@@ -355,7 +355,7 @@ export default new Router({
     {
       path: '/section4',
       component: Layout,
-      redirect: '/section4',
+      redirect: '/dashboard',
       name: '竖井式泄洪洞水力学计算',
       meta: { title: '竖井式泄洪洞水力学计算', icon: 'nested' },
       children: [
@@ -376,7 +376,7 @@ export default new Router({
     {
       path: '/section5',
       component: Layout,
-      redirect: '/section5',
+      redirect: '/dashboard',
       name: '混凝土重力（拱）坝水力学计算',
       meta: { title: '混凝土重力（拱）坝水力学计算', icon: 'nested' },
       children: [
@@ -482,7 +482,7 @@ export default new Router({
     {
       path: '/section6',
       component: Layout,
-      redirect: '/section6',
+      redirect: '/dashboard',
       name: '渠道水力学计算',
       meta: { title: '渠道水力学计算', icon: 'nested' },
       children: [
@@ -503,7 +503,7 @@ export default new Router({
     {
       path: '/section7',
       component: Layout,
-      redirect: '/section7',
+      redirect: '/dashboard',
       name: '水电站（含抽蓄）压力管道水力学计算',
       meta: { title: '水电站（含抽蓄）压力管道水力学计算', icon: 'nested' },
       children: [
@@ -564,7 +564,7 @@ export default new Router({
     {
       path: '/section8',
       component: Layout,
-      redirect: '/section8',
+      redirect: '/dashboard',
       name: '城镇供水长距离输水管（渠）道水力学计算',
       meta: { title: '城镇供水长距离输水管（渠）道水力学计算', icon: 'nested' },
       children: [

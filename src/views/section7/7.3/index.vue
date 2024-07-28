@@ -1,20 +1,21 @@
 <template>
-  <el-card class="box-card">
-    <div
-      slot="header"
-      class="clearfix"
-    >
-      <h3>7.3 水锤计算</h3>
-    </div>
-    <transition
-      name="fade-transform"
-      mode="out-in"
-    >
-      <router-view />
-    </transition>
-  </el-card>
+  <menu-card
+    title="7.3 水锤计算"
+    :level="2"
+    icon-type="calculation"
+  >
+    <router-view />
+  </menu-card>
 </template>
 
 <script lang="ts">
-export default {}
+import { Component, Vue } from 'vue-property-decorator'
+import MenuCard from '@/components/MenuCard/index.vue'
+
+@Component({
+  components: {
+    MenuCard
+  }
+})
+export default class DischargeCapacityCalculation extends Vue {}
 </script>
