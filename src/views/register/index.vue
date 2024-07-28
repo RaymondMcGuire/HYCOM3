@@ -1,114 +1,68 @@
 <template>
   <div class="register-container">
-    <el-form
-      ref="registerForm"
-      :model="registerForm"
-      :rules="registerRules"
-      class="register-form"
-      auto-complete="on"
-      label-position="left"
-    >
-      <h3 class="title">
-        注册账号
-      </h3>
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon name="user" />
-        </span>
-        <el-input
-          v-model="registerForm.username"
-          name="username"
-          type="text"
-          auto-complete="on"
-          placeholder="请输入用户名"
-        />
-      </el-form-item>
-      <el-form-item prop="work">
-        <span class="svg-container">
-          <svg-icon name="form" />
-        </span>
-        <el-input
-          v-model="registerForm.work"
-          name="work"
-          type="text"
-          auto-complete="on"
-          placeholder="请输入从事职业"
-        />
-      </el-form-item>
-      <el-form-item prop="level">
-        <span class="svg-container">
-          <svg-icon name="form" />
-        </span>
-        <el-input
-          v-model="registerForm.level"
-          name="level"
-          type="text"
-          auto-complete="on"
-          placeholder="请输入您的职称"
-        />
-      </el-form-item>
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon name="password" />
-        </span>
-        <el-input
-          v-model="registerForm.password"
-          :type="pwdType"
-          name="password"
-          auto-complete="on"
-          placeholder="请输入密码"
-        />
-        <span
-          class="show-pwd"
-          @click="showPwd"
+    <div class="register-box">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="register-content">
+        <h2 class="title">注册账号</h2>
+        <el-form
+          ref="registerForm"
+          :model="registerForm"
+          :rules="registerRules"
+          class="register-form"
         >
-          <svg-icon :name="pwdType === 'password' ? 'eye-off' : 'eye-on'" />
-        </span>
-      </el-form-item>
-      <el-form-item prop="confirm_password">
-        <span class="svg-container">
-          <svg-icon name="password" />
-        </span>
-        <el-input
-          v-model="registerForm.confirm_password"
-          :type="pwdType"
-          name="confirm_password"
-          auto-complete="on"
-          placeholder="请再次输入密码"
-          @keyup.enter.native="handleRegister"
-        />
-        <span
-          class="show-pwd"
-          @click="showPwd"
-        >
-          <svg-icon :name="pwdType === 'password' ? 'eye-off' : 'eye-on'" />
-        </span>
-      </el-form-item>
-      <el-form-item>
-        <el-button
-          :loading="loading"
-          type="primary"
-          style="width:100%;"
-          @click.native.prevent="handleRegister"
-        >
-          注册
-        </el-button>
-      </el-form-item>
-
-      <el-button
-        type="primary"
-        style="width:100%;"
-        @click.native.prevent="loginPage"
-      >
-        返回
-      </el-button>
-    </el-form>
+          <el-form-item prop="username">
+            <el-input
+              v-model="registerForm.username"
+              placeholder="请输入用户名"
+              prefix-icon="el-icon-user"
+            />
+          </el-form-item>
+          <el-form-item prop="work">
+            <el-input
+              v-model="registerForm.work"
+              placeholder="请输入从事职业"
+              prefix-icon="el-icon-suitcase"
+            />
+          </el-form-item>
+          <el-form-item prop="level">
+            <el-input
+              v-model="registerForm.level"
+              placeholder="请输入您的职称"
+              prefix-icon="el-icon-medal"
+            />
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input
+              v-model="registerForm.password"
+              :type="pwdType"
+              placeholder="请输入密码"
+              prefix-icon="el-icon-lock"
+            />
+          </el-form-item>
+          <el-form-item prop="confirm_password">
+            <el-input
+              v-model="registerForm.confirm_password"
+              :type="pwdType"
+              placeholder="请再次输入密码"
+              prefix-icon="el-icon-lock"
+              @keyup.enter.native="handleRegister"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" :loading="loading" @click="handleRegister">注册</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="text" @click="loginPage">返回登录</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { UserModule } from '@/store/modules/user'
 import { Route } from 'vue-router'
 import { Form as ElForm } from 'element-ui'
 import { Identicon } from '../../identicon_lib/identicon'
@@ -125,28 +79,6 @@ export default class Register extends Vue {
     level: ''
   };
 
-  private validateUsername = (rule: any, value: string, callback: any) => {
-    if (value.length < 5) {
-      callback(new Error('用户名不能小于5位'))
-    } else {
-      callback()
-    }
-  };
-  private validatePass = (rule: any, value: string, callback: any) => {
-    if (value.length < 5) {
-      callback(new Error('密码不能小于5位'))
-    } else {
-      callback()
-    }
-  };
-
-  private validateConfirmPass = (rule: any, value: string, callback: any) => {
-    if (value !== this.registerForm.password) {
-      callback(new Error('与输入密码不一致'))
-    } else {
-      callback()
-    }
-  };
   private registerRules = {
     username: [
       { required: true, trigger: 'blur', validator: this.validateUsername }
@@ -158,21 +90,42 @@ export default class Register extends Vue {
       { required: true, trigger: 'blur', validator: this.validateConfirmPass }
     ]
   };
+
   private loading = false;
   private redirect: string | undefined = undefined;
   private pwdType = 'password';
-  private showPwd() {
-    if (this.pwdType === 'password') {
-      this.pwdType = ''
-    } else {
-      this.pwdType = 'password'
-    }
-  }
+
   @Watch('$route', { immediate: true })
   private OnRouteChange(route: Route) {
-    // TODO: remove the "as string" hack after v4 release for vue-router
-    // See https://github.com/vuejs/vue-router/pull/2050 for details
     this.redirect = route.query && (route.query.redirect as string)
+  }
+
+  private validateUsername(rule: any, value: string, callback: any) {
+    if (value.length < 5) {
+      callback(new Error('用户名不能小于5位'))
+    } else {
+      callback()
+    }
+  }
+
+  private validatePass(rule: any, value: string, callback: any) {
+    if (value.length < 5) {
+      callback(new Error('密码不能小于5位'))
+    } else {
+      callback()
+    }
+  }
+
+  private validateConfirmPass(rule: any, value: string, callback: any) {
+    if (value !== this.registerForm.password) {
+      callback(new Error('与输入密码不一致'))
+    } else {
+      callback()
+    }
+  }
+
+  private showPwd() {
+    this.pwdType = this.pwdType === 'password' ? '' : 'password'
   }
 
   private loginPage() {
@@ -180,7 +133,6 @@ export default class Register extends Vue {
   }
 
   private handleUserIcon(usrId: string) {
-    // config
     const size = 420
     const pixel = 70
     const frame = 35
@@ -236,14 +188,19 @@ export default class Register extends Vue {
           .then((user: any) => {
             this.loading = false
             this.handleCopyUsrInfo()
-            this.$message('创建用户成功!')
-            this.registerForm.username = this.registerForm.password = this.registerForm.level = this.registerForm.work = this.registerForm.confirm_password =
-              ''
+            this.$message({
+              message: '创建用户成功!',
+              type: 'success'
+            })
+            this.registerForm.username = this.registerForm.password = this.registerForm.level = this.registerForm.work = this.registerForm.confirm_password = ''
             // this.loginPage()
           })
           .catch(() => {
             this.loading = false
-            this.$message('创建用户失败!')
+            this.$message({
+              message: '创建用户失败!',
+              type: 'error'
+            })
           })
       }
     })
@@ -251,100 +208,165 @@ export default class Register extends Vue {
 }
 </script>
 
-<style lang="scss">
-@import "src/styles/variables.scss";
+<style lang="scss" scoped>
+$deep-blue: #0f4c75;
+$medium-blue: #3282b8;
+$light-blue: #bbe1fa;
+
+.login-container,
+.register-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, $deep-blue, $medium-blue);
+  overflow-y: auto; // 允许在必要时滚动
+}
+
+.login-box,
+.register-box {
+  width: 400px;
+  max-width: 90%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+  padding: 40px 20px;
+  margin: 20px 0; // 添加上下边距
+  box-sizing: border-box;
+}
 
 .register-container {
-  .el-input {
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      color: $lightGray;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, $deep-blue, $medium-blue);
+  overflow: hidden;
+}
 
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $loginBg inset !important;
-        -webkit-box-shadow: 0 0 0px 1000px $loginBg inset !important;
-        -webkit-text-fill-color: #fff !important;
+.register-box {
+  position: relative;
+  width: 400px;
+  max-width: 100%;
+  height: 600px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+}
+
+.wave {
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  width: 1000px;
+  height: 1000px;
+  margin-left: -500px;
+  margin-top: -500px;
+  border-radius: 40%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: wave 15s infinite linear;
+
+  &:nth-child(2) {
+    animation-delay: -5s;
+  }
+}
+
+@keyframes wave {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.register-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  text-align: center;
+}
+
+.title {
+  color: $light-blue;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.register-form {
+  .el-form-item {
+    margin-bottom: 20px;
+  }
+
+  .el-input {
+    :deep(input) {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: $light-blue;
+      height: 40px;
+
+      &::placeholder {
+        color: rgba(187, 225, 250, 0.7);
+      }
+    }
+
+    :deep(.el-input__prefix) {
+      color: $light-blue;
+    }
+  }
+
+  .el-button {
+    width: 100%;
+    height: 40px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+
+    &[type="primary"] {
+      background-color: $light-blue;
+      border: none;
+      color: $deep-blue;
+
+      &:hover {
+        background-color: darken($light-blue, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    &[type="text"] {
+      color: $light-blue;
+      background: transparent;
+      margin-top: 10px;
+
+      &:hover {
+        color: darken($light-blue, 10%);
       }
     }
   }
 }
-</style>
 
-<style lang="scss" scoped>
-@import "src/styles/variables.scss";
-
-.register-container {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  background-color: $loginBg;
-
-  .register-form {
-    position: absolute;
-    max-width: 100%;
-    padding: 35px 35px 15px 35px;
-    //phone
-    @media screen and (max-width: 1024px) {
-      left: 10%;
-      width: 80%;
-    }
-    //pc
-    @media screen and (min-width: 1024px) {
-      left: 30%;
-      width: 40%;
-    }
-  }
-
-  .el-input {
-    display: inline-block;
-    width: 85%;
-  }
-
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $darkGray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
+// 响应式调整
+@media screen and (max-height: 600px) {
+  .login-box,
+  .register-box {
+    padding: 20px 15px;
   }
 
   .title {
-    font-size: 26px;
-    font-weight: 400;
-    color: $lightGray;
-    margin: 0px auto 40px auto;
-    text-align: center;
-    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 15px;
   }
 
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $darkGray;
-    cursor: pointer;
-    user-select: none;
+  .el-form-item {
+    margin-bottom: 15px;
   }
 }
+
 </style>

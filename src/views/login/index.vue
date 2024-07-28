@@ -9,72 +9,42 @@
 -->
 <template>
   <div class="login-container">
-    <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
-      auto-complete="on"
-      label-position="left"
-    >
-      <h3 class="title">
-        水力学计算程序HYCOM3.0
-      </h3>
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon name="user" />
-        </span>
-        <el-input
-          v-model="loginForm.username"
-          name="username"
-          type="text"
-          auto-complete="on"
-          placeholder="用户名"
-        />
-      </el-form-item>
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon name="password" />
-        </span>
-        <el-input
-          v-model="loginForm.password"
-          :type="pwdType"
-          name="password"
-          auto-complete="on"
-          placeholder="密码"
-          @keyup.enter.native="handleLogin"
-        />
-        <span
-          class="show-pwd"
-          @click="showPwd"
+    <div class="login-box">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="login-content">
+        <h2 class="title">HYCOM3 <span class="version">v{{ version }}</span></h2>
+        <p class="subtitle">水力学计算程序</p>
+        <el-form
+          ref="loginForm"
+          :model="loginForm"
+          :rules="loginRules"
+          class="login-form"
         >
-          <svg-icon :name="pwdType === 'password' ? 'eye-off' : 'eye-on'" />
-        </span>
-      </el-form-item>
-      <el-form-item>
-        <el-button
-          :loading="loading"
-          type="primary"
-          style="width: 100%"
-          @click.native.prevent="handleLogin"
-        >
-          登录
-        </el-button>
-      </el-form-item>
-
-      <el-button
-        type="primary"
-        style="width: 100%"
-        @click.native.prevent="registerPage"
-      >
-        注册
-      </el-button>
-      <el-row class="tips">
-        <br>
-        <span>如有任何问题请联系</span>
-        <a :href="`mailto:hycom3@gmail.com`">hycom3@gmail.com</a>
-      </el-row>
-    </el-form>
+          <el-form-item prop="username">
+            <el-input
+              v-model="loginForm.username"
+              placeholder="用户名"
+              prefix-icon="el-icon-user"
+            />
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input
+              v-model="loginForm.password"
+              type="password"
+              placeholder="密码"
+              prefix-icon="el-icon-lock"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleLogin">登录</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="text" @click="registerPage">注册新账号</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -84,6 +54,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Route } from 'vue-router'
 import { Form as ElForm } from 'element-ui'
 import { setToken } from '@/utils/auth'
+import { getVersion } from '@/utils/version'
 
 const AV = require('leancloud-storage')
 
@@ -117,6 +88,7 @@ export default class Login extends Vue {
   public loading = false;
   public pwdType = 'password';
   public redirect: string | undefined = undefined;
+  public version = getVersion()
 
   @Watch('$route', { immediate: true })
   public OnRouteChange(route: Route) {
@@ -167,94 +139,173 @@ export default class Login extends Vue {
 }
 </script>
 
-<style lang="scss">
-@import "src/styles/variables.scss";
+<style lang="scss" scoped>
+$deep-blue: #0f4c75;
+$medium-blue: #3282b8;
+$light-blue: #bbe1fa;
+
+.login-container,
+.register-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, $deep-blue, $medium-blue);
+  overflow-y: auto; // 允许在必要时滚动
+}
+
+.login-box,
+.register-box {
+  width: 400px;
+  max-width: 90%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+  padding: 40px 20px;
+  margin: 20px 0; // 添加上下边距
+  box-sizing: border-box;
+}
 
 .login-container {
-  .el-input {
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      color: $lightGray;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, $deep-blue, $medium-blue);
+  overflow: hidden;
+}
 
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $loginBg inset !important;
-        -webkit-box-shadow: 0 0 0px 1000px $loginBg inset !important;
-        -webkit-text-fill-color: #fff !important;
+.login-box {
+  position: relative;
+  width: 400px;
+  height: 480px; // 稍微增加高度以容纳新按钮
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+}
+
+.wave {
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  width: 1000px;
+  height: 1000px;
+  margin-left: -500px;
+  margin-top: -500px;
+  border-radius: 40%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: wave 15s infinite linear;
+
+  &:nth-child(2) {
+    animation-delay: -5s;
+  }
+}
+
+@keyframes wave {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.login-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  text-align: center;
+}
+
+.title {
+  color: $light-blue;
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.version {
+  font-size: 14px;
+  vertical-align: super;
+}
+
+.subtitle {
+  color: $light-blue;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.login-form {
+  .el-input {
+    margin-bottom: 20px;
+
+    :deep(input) {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: $light-blue;
+      height: 40px;
+
+      &::placeholder {
+        color: rgba(187, 225, 250, 0.7);
+      }
+    }
+
+    :deep(.el-input__prefix) {
+      color: $light-blue;
+    }
+  }
+
+  .el-button {
+    width: 100%;
+    height: 40px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+
+    &[type="primary"] {
+      background-color: $light-blue;
+      border: none;
+      color: $deep-blue;
+
+      &:hover {
+        background-color: darken($light-blue, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    &[type="text"] {
+      color: $light-blue;
+      background: transparent;
+      margin-top: 10px;
+
+      &:hover {
+        color: darken($light-blue, 10%);
       }
     }
   }
 }
-</style>
 
-<style lang="scss" scoped>
-@import "src/styles/variables.scss";
-
-.login-container {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  background-color: $loginBg;
-
-  .login-form {
-    position: absolute;
-    left: 0;
-    right: 0;
-    width: 520px;
-    max-width: 100%;
-    padding: 35px 35px 15px 35px;
-    margin: 120px auto;
-  }
-
-  .el-input {
-    display: inline-block;
-    width: 85%;
-  }
-
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $darkGray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
+// 响应式调整
+@media screen and (max-height: 600px) {
+  .login-box,
+  .register-box {
+    padding: 20px 15px;
   }
 
   .title {
-    font-size: 26px;
-    font-weight: 400;
-    color: $lightGray;
-    margin: 0px auto 40px auto;
-    text-align: center;
-    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 15px;
   }
 
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $darkGray;
-    cursor: pointer;
-    user-select: none;
+  .el-form-item {
+    margin-bottom: 15px;
   }
 }
+
 </style>
