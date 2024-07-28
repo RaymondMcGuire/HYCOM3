@@ -10,11 +10,15 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <div class="wave"></div>
-      <div class="wave"></div>
+      <div class="wave" />
+      <div class="wave" />
       <div class="login-content">
-        <h2 class="title">HYCOM3 <span class="version">v{{ version }}</span></h2>
-        <p class="subtitle">水力学计算程序</p>
+        <h2 class="title">
+          HYCOM3 <span class="version">v{{ version }}</span>
+        </h2>
+        <p class="subtitle">
+          水力学计算程序
+        </p>
         <el-form
           ref="loginForm"
           :model="loginForm"
@@ -37,10 +41,20 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleLogin">登录</el-button>
+            <el-button
+              type="primary"
+              @click="handleLogin"
+            >
+              登录
+            </el-button>
           </el-form-item>
           <el-form-item>
-            <el-button type="text" @click="registerPage">注册新账号</el-button>
+            <el-button
+              type="text"
+              @click="registerPage"
+            >
+              注册新账号
+            </el-button>
           </el-form-item>
         </el-form>
       </div>

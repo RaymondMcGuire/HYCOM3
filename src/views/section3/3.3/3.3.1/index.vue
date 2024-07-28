@@ -180,7 +180,6 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 
-
 import HycomForm from '@/components/HycomForm/index.vue'
 
 // 局部

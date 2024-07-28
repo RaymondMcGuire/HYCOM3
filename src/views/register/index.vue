@@ -1,10 +1,12 @@
 <template>
   <div class="register-container">
     <div class="register-box">
-      <div class="wave"></div>
-      <div class="wave"></div>
+      <div class="wave" />
+      <div class="wave" />
       <div class="register-content">
-        <h2 class="title">注册账号</h2>
+        <h2 class="title">
+          注册账号
+        </h2>
         <el-form
           ref="registerForm"
           :model="registerForm"
@@ -50,10 +52,21 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" :loading="loading" @click="handleRegister">注册</el-button>
+            <el-button
+              type="primary"
+              :loading="loading"
+              @click="handleRegister"
+            >
+              注册
+            </el-button>
           </el-form-item>
           <el-form-item>
-            <el-button type="text" @click="loginPage">返回登录</el-button>
+            <el-button
+              type="text"
+              @click="loginPage"
+            >
+              返回登录
+            </el-button>
           </el-form-item>
         </el-form>
       </div>
