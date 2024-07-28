@@ -1,0 +1,14 @@
+<!--
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-05-21 12:37:10
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-06-12 13:18:27
+ * @FilePath: \hycom_app\.eslintignore
+ * @Description: 
+ * Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved. 
+-->
+dist/*.js
+src/assets
+src/identicon_lib
+src/components/Html2pdf
+tests/unit/coverage

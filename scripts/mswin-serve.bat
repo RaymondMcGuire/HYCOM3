@@ -1,0 +1,5 @@
+cd ..
+
+yarn serve
+
+pause
