@@ -95,7 +95,7 @@ export default class DashboardEditor extends Vue {
   background-repeat: no-repeat;
   background-size: cover;
   transition: background-image 0.3s ease-in-out;
-  background-image: url("../../assets/images/HYCOM_2.0.png");
+  background-image: url("../../assets/images/HYCOM_3.0.png");
 }
 
 .mobile-overlay {
