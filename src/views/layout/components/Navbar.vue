@@ -65,9 +65,9 @@
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Hamburger from '@/components/Hamburger/index.vue'
 import { Component, Vue } from 'vue-property-decorator'
-import AV from 'leancloud-storage'
 import { AppModule } from '@/store/modules/app'
 import { UserModule } from '@/store/modules/user'
+import { authService } from '@/services/authService'
 
 @Component({
   components: {
@@ -107,26 +107,19 @@ export default class Navbar extends Vue {
   }
 
   private fetchUsrIcon() {
-    var currentUser = AV.User.current()
-    var username = currentUser.attributes['username']
-    var cql = 'select * from UsrInfo where username = ?'
-    var pvalue = [username]
-    AV.Query.doCloudQuery(cql, pvalue).then(
-      (results: any) => {
-        results.results.forEach((ele: any) => {
-          const attr = ele.attributes
-          this.usricon = attr['usericon']
-        })
-      },
-      (error: any) => {
+    authService.fetchCurrentUserAvatar()
+      .then((avatar) => {
+        if (avatar) {
+          this.usricon = avatar
+        }
+      })
+      .catch((error: Error) => {
         console.log(error)
-      }
-    )
+      })
   }
 
   private logout() {
     UserModule.LogOut().then(() => {
-      AV.User.logOut()
       this.$router.push({ path: '/login' })
     })
   }

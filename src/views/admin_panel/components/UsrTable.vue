@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import AV from 'leancloud-storage'
+import { adminService, UserInfoRecord } from '@/services/adminService'
 
 @Component({
   filters: {
@@ -60,22 +60,20 @@ import AV from 'leancloud-storage'
   }
 })
 export default class MailFormTable extends Vue {
-  private usrList: Array<Object> = []
+  private usrList: UserInfoRecord[] = []
   private title : string = '用户列表'
   created() {
     this.fetchData()
   }
 
   private fetchData() {
-    var cql = 'select * from UsrInfo'
-    AV.Query.doCloudQuery(cql).then((results:any) => {
-      results.results.forEach((ele:any) => {
-        const attr = ele.attributes
-        this.usrList.push(attr)
+    adminService.fetchUsers()
+      .then((records) => {
+        this.usrList = records
       })
-    }, (error:any) => {
-      console.log(error)
-    })
+      .catch((error: Error) => {
+        console.log(error)
+      })
   }
 }
 </script>

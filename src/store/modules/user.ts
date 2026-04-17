@@ -7,8 +7,8 @@
  * @FilePath: \hycom_app\src\store\modules\user.ts
  */
 import { VuexModule, Module, MutationAction, Mutation, Action, getModule } from 'vuex-module-decorators'
-import { login, users } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { authService } from '@/services/authService'
+import { getToken, removeToken } from '@/utils/auth'
 import store from '@/store'
 
 export interface IUserState {
@@ -27,15 +27,6 @@ class User extends VuexModule implements IUserState {
   public intro = '';
 
   @Action({ commit: 'SET_TOKEN' })
-  public async Login(userInfo: { username: string, password: string }) {
-    const username = userInfo.username.trim()
-    const { data } = await login(username, userInfo.password)
-    // console.log(data)
-    setToken(data.token, 60)
-    return data.token
-  }
-
-  @Action({ commit: 'SET_TOKEN' })
   public async FedLogOut() {
     removeToken()
     return ''
@@ -44,18 +35,18 @@ class User extends VuexModule implements IUserState {
   @MutationAction({ mutate: ['roles', 'name', 'avatar', 'intro'] })
   public async GetUserInfo() {
     const token = getToken()
-    if (token === undefined) {
+    if (token === null) {
       throw Error('GetUserInfo: token is undefined!')
     }
 
-    // const { data } = await getUserInfo(token)
-    const data = users[token]
-    if (data.roles && data.roles.length > 0) {
+    const data = authService.getProfileByToken(token)
+    const roles = [data.role]
+    if (roles.length > 0) {
       return {
-        roles: data.roles,
+        roles,
         name: data.name,
         avatar: data.avatar,
-        intro: data.introduction
+        intro: data.intro
       }
     } else {
       throw Error('GetUserInfo: roles must be a non-null array!')
@@ -64,10 +55,10 @@ class User extends VuexModule implements IUserState {
 
   @MutationAction({ mutate: ['token', 'roles'] })
   public async LogOut() {
-    if (getToken() === undefined) {
+    if (getToken() === null) {
       throw Error('LogOut: token is undefined!')
     }
-    // await logout()
+    await authService.logout()
     removeToken()
     return {
       token: '',

@@ -63,12 +63,11 @@
 </template>
 
 <script lang="ts">
-import { isValidUsername } from '@/utils/validate'
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Route } from 'vue-router'
 import { Form as ElForm } from 'element-ui'
-import AV from 'leancloud-storage'
-import { setToken } from '@/utils/auth'
+import { authService } from '@/services/authService'
+import { ServiceError } from '@/services/errors'
 import { getVersion } from '@/utils/version'
 
 const validateUsername = (rule: any, value: string, callback: any) => {
@@ -126,22 +125,14 @@ export default class Login extends Vue {
     (this.$refs.loginForm as ElForm).validate((valid: boolean) => {
       if (valid) {
         this.loading = true
-        AV.User.logIn(this.loginForm.username.trim(), this.loginForm.password)
-          .then((user: any) => {
-            const usr = user.toJSON()
-
-            if (usr.auth === 'S') {
-              setToken('admin-token', 60)
-            } else {
-              setToken('developer-token', 60)
-            }
-
-            this.$message('欢迎用户 ' + usr.username + ' 使用HYCOM3.0！')
+        authService.login(this.loginForm)
+          .then((session) => {
+            this.$message('欢迎用户 ' + session.username + ' 使用HYCOM3.0！')
             this.loading = false
             this.$router.push({ path: this.redirect || '/' })
           })
-          .catch(() => {
-            this.$message('账号不匹配')
+          .catch((error: ServiceError) => {
+            this.$message(error.message || '账号不匹配')
             this.loading = false
           })
       } else {

@@ -102,10 +102,10 @@
 </template>
 
 <script lang="ts">
-import emailjs from 'emailjs-com'
-import { Component, Vue, Emit } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { Form as ElForm } from 'element-ui'
-import AV from 'leancloud-storage'
+import { feedbackService } from '@/services/feedbackService'
+import { ServiceError } from '@/services/errors'
 
 const validateEmail = (rule: any, value: string, callback: any) => {
   const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
@@ -141,38 +141,20 @@ export default class ContactForm extends Vue {
     message: [{ required: true, trigger: 'blur', validator: validateMsg }]
   };
 
-  private handleContract() {
-    var Forms = AV.Object.extend('MailForms')
-    var formObject = new Forms()
-    formObject
-      .save({
-        title: this.data.title,
-        to_name: this.data.to_name,
-        email_address: this.data.email_address,
-        message: this.data.message
-      })
-      .then((object: any) => {
-        this.$message('感谢您的提交,我们会尽快与您取得联系！')
-        this.data.title = ''
-        this.data.to_name = ''
-        this.data.email_address = ''
-        this.data.message = ''
-      })
-      .catch(() => {
-        this.$message('提交意见失败!')
-      })
-  }
-
   private SendEmail() {
     (this.$refs.contact_form as ElForm).validate((valid: boolean) => {
       if (valid) {
-        emailjs.sendForm(
-          'service_6byd0uo',
-          'template_pzvw4ie',
-          (this.$refs.contact_form as Vue).$el as HTMLFormElement,
-          'SsfGAVHMRIhgMrZtq'
-        )
-        this.handleContract()
+        feedbackService.submit(this.data)
+          .then(() => {
+            this.$message('感谢您的提交,我们会尽快与您取得联系！')
+            this.data.title = ''
+            this.data.to_name = ''
+            this.data.email_address = ''
+            this.data.message = ''
+          })
+          .catch((error: ServiceError) => {
+            this.$message(error.message || '提交意见失败!')
+          })
       } else {
         return false
       }

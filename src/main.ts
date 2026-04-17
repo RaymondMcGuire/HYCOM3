@@ -22,14 +22,9 @@ import store from '@/store'
 import router from '@/router'
 
 import MathJax, { initMathJax, renderByMathjax } from '@/plugins/mathjax'
-import AV from 'leancloud-storage'
-AV.init({
-  // serverURLs:'https://avoscloud.com',
-  // appId: 'vXHukUzIVdJ2vokL1Vm8cqv2-MdYXbMMI',
-  // appKey: 'SbIy6cVycia7S8iOt8AY70i0'
-  appId: 'MCpP0K0Apfobt7aP07WmqjLR-gzGzoHsz',
-  appKey: '1fdT0oaT8EPwwhxp71ggRS19'
-})
+import { initializeLeanCloud } from '@/integrations/leancloud/client'
+
+initializeLeanCloud()
 
 function onMathJaxReady() {
   const el = document.getElementById('app')

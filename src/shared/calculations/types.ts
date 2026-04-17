@@ -1,0 +1,43 @@
+export type PrimitiveFieldType = 'number' | 'text' | 'boolean' | 'select' | 'textarea';
+
+export interface SelectOption {
+  label: string;
+  value: string | number | boolean;
+}
+
+export interface FieldSchema {
+  key: string;
+  label?: string;
+  latex?: string;
+  type: PrimitiveFieldType;
+  defaultValue?: string | number | boolean;
+  readonly?: boolean;
+  placeholder?: string;
+  options?: SelectOption[];
+}
+
+export interface ResultSchema {
+  key: string;
+  label: string;
+}
+
+export interface DemoCase<TInput = Record<string, any>> {
+  values: Partial<TInput>;
+  description: string;
+  expectedResult: string;
+}
+
+export interface CalculationExecutionContext<TInput = Record<string, any>> {
+  input: TInput;
+  setResult: (value: string) => void;
+}
+
+export interface CalculationDefinition<TInput = Record<string, any>, TOutput = string> {
+  title: string;
+  fields: FieldSchema[];
+  formulas: Record<string, any>;
+  result?: ResultSchema;
+  demoCase?: DemoCase<TInput>;
+  execute: (context: CalculationExecutionContext<TInput>) => TOutput | Promise<TOutput>;
+  formatResult?: (result: TOutput) => string;
+}

@@ -3,7 +3,7 @@
     <el-container>
       <el-header>
         <h2 class="form-title">
-          {{ title }}
+          {{ effectiveTitle }}
         </h2>
       </el-header>
       <el-main>
@@ -14,7 +14,7 @@
         >
           <slot name="equ_explain_anchor" />
 
-          <param-explain :formulas="formulas" />
+          <param-explain :formulas="effectiveFormulas" />
 
           <slot name="table_fir_anchor" />
 
@@ -26,83 +26,19 @@
 
           <div class="params-input">
             <div
-              v-for="(value, index) in data"
-              :key="index"
+              v-for="field in renderedFields"
+              :key="field.key"
               class="param-item"
             >
               <div class="param-label">
-                <math-jax :latex="index" />
+                <math-jax :latex="fieldLabel(field)" />
               </div>
               <div class="param-input">
                 <el-form-item>
-                  <div v-if="index === '实用堰类型'">
+                  <div v-if="field.type === 'select' && usesOptionGroups(field.key)">
                     <el-select
-                      v-model="data[index]"
-                      style="width: 100%;"
-                    >
-                      <el-option
-                        v-for="syy in syyOptions"
-                        :key="syy.value"
-                        :label="syy.label"
-                        :value="syy.value"
-                      />
-                    </el-select>
-                  </div>
-                  <div v-else-if="index === '断面形状'">
-                    <el-select
-                      v-model="data[index]"
-                      style="width: 100%;"
-                    >
-                      <el-option
-                        v-for="sp in shapeOptions"
-                        :key="sp.value"
-                        :label="sp.label"
-                        :value="sp.value"
-                      />
-                    </el-select>
-                  </div>
-                  <div v-else-if="index === '驼峰堰堰型'">
-                    <el-select
-                      v-model="data[index]"
-                      style="width: 100%;"
-                    >
-                      <el-option
-                        v-for="sp in tfyTypeOptions"
-                        :key="sp.value"
-                        :label="sp.label"
-                        :value="sp.value"
-                      />
-                    </el-select>
-                  </div>
-                  <div v-else-if="index === '进口底坎边缘'">
-                    <el-select
-                      v-model="data[index]"
-                      style="width: 100%;"
-                    >
-                      <el-option
-                        v-for="sp in jkdkbyTypeOptions"
-                        :key="sp.value"
-                        :label="sp.label"
-                        :value="sp.value"
-                      />
-                    </el-select>
-                  </div>
-                  <div v-else-if="index === '可冲类别'">
-                    <el-select
-                      v-model="data[index]"
-                      style="width: 100%;"
-                    >
-                      <el-option
-                        v-for="sp in kechongOptions"
-                        :key="sp.value"
-                        :label="sp.label"
-                        :value="sp.value"
-                      />
-                    </el-select>
-                  </div>
-                  <div v-else-if="index === '水流边壁类型'">
-                    <el-select
-                      v-model="data[index]"
+                      v-model="effectiveData[field.key]"
+                      :disabled="field.readonly"
                       style="width: 100%;"
                     >
                       <el-option-group
@@ -119,17 +55,47 @@
                       </el-option-group>
                     </el-select>
                   </div>
-                  <div v-else-if="typeof data[index] === 'number'">
+                  <div v-else-if="field.type === 'select'">
+                    <el-select
+                      v-model="effectiveData[field.key]"
+                      :disabled="field.readonly"
+                      style="width: 100%;"
+                    >
+                      <el-option
+                        v-for="option in getFieldOptions(field)"
+                        :key="option.value"
+                        :label="option.label"
+                        :value="option.value"
+                      />
+                    </el-select>
+                  </div>
+                  <div v-else-if="field.type === 'number'">
                     <el-input-number
-                      v-model="data[index]"
+                      v-model="effectiveData[field.key]"
+                      :disabled="field.readonly"
                       style="width: 100%;"
                     />
                   </div>
-                  <div v-else-if="typeof data[index] === 'boolean'">
-                    <el-switch v-model="data[index]" />
+                  <div v-else-if="field.type === 'boolean'">
+                    <el-switch
+                      v-model="effectiveData[field.key]"
+                      :disabled="field.readonly"
+                    />
                   </div>
-                  <div v-else-if="typeof data[index] === 'string'">
-                    <el-input v-model="data[index]" />
+                  <div v-else-if="field.type === 'textarea'">
+                    <el-input
+                      v-model="effectiveData[field.key]"
+                      :disabled="field.readonly"
+                      :placeholder="field.placeholder"
+                      type="textarea"
+                    />
+                  </div>
+                  <div v-else>
+                    <el-input
+                      v-model="effectiveData[field.key]"
+                      :disabled="field.readonly"
+                      :placeholder="field.placeholder"
+                    />
                   </div>
                 </el-form-item>
               </div>
@@ -181,8 +147,8 @@
             算例
           </el-divider>
 
-          <p>{{ demoContent }}</p>
-          <strong>{{ demoResult }}</strong>
+          <p>{{ effectiveDemoContent }}</p>
+          <strong>{{ effectiveDemoResult }}</strong>
         </el-form>
       </el-main>
     </el-container>
@@ -194,6 +160,7 @@ import VueParamaters from '@/components/VueParamaters/index.vue'
 import ParamExplain from './components/ParamExplain.vue'
 import { syyType, shapeType, tfyType, jkdkbyType } from '@/hycom_lib/common'
 import { MathJax } from '@/plugins/mathjax'
+import { applyDemoCase, CalculationDefinition, FieldSchema, resetCalculationState } from '@/shared/calculations'
 
 @Component({
   components: {
@@ -209,6 +176,8 @@ export default class HycomForm extends Vue {
   @Prop() demoContent!: string;
   @Prop() demoResult!: string;
   @Prop() formulas!: Record<string, any>;
+  @Prop({ default: null }) definition!: CalculationDefinition | null;
+  @Prop({ default: null }) state!: Record<string, any> | null;
 
   form = { result: '' };
 
@@ -287,6 +256,38 @@ export default class HycomForm extends Vue {
     }
   ]
 
+  get effectiveData(): Record<string, any> {
+    return this.state || this.data
+  }
+
+  get effectiveTitle(): string {
+    return this.definition?.title || this.title
+  }
+
+  get effectiveFormulas(): Record<string, any> {
+    return this.definition?.formulas || this.formulas
+  }
+
+  get effectiveDemoContent(): string {
+    return this.definition?.demoCase?.description || this.demoContent
+  }
+
+  get effectiveDemoResult(): string {
+    return this.definition?.demoCase?.expectedResult || this.demoResult
+  }
+
+  get renderedFields(): FieldSchema[] {
+    if (this.definition) {
+      return this.definition.fields
+    }
+
+    return Object.keys(this.effectiveData || {}).map((key) => ({
+      key,
+      latex: key,
+      type: this.inferLegacyFieldType(key)
+    }))
+  }
+
   getSelectOptions(key: string): any[] {
     switch (key) {
       case '实用堰类型': return this.syyOptions
@@ -298,22 +299,84 @@ export default class HycomForm extends Vue {
     }
   }
 
+  fieldLabel(field: FieldSchema): string {
+    return field.latex || field.label || field.key
+  }
+
+  usesOptionGroups(key: string): boolean {
+    return key === '水流边壁类型'
+  }
+
+  getFieldOptions(field: FieldSchema): any[] {
+    if (field.options && field.options.length > 0) {
+      return field.options
+    }
+
+    return this.getSelectOptions(field.key)
+  }
+
+  inferLegacyFieldType(key: string): FieldSchema['type'] {
+    const options = this.getSelectOptions(key)
+    if (options.length > 0 || this.usesOptionGroups(key)) {
+      return 'select'
+    }
+
+    const value = this.effectiveData?.[key]
+    if (typeof value === 'number') {
+      return 'number'
+    }
+
+    if (typeof value === 'boolean') {
+      return 'boolean'
+    }
+
+    return 'text'
+  }
+
   onDemo(): void {
-    for (const key in this.initData) {
-      this.data[key] = this.initData[key]
+    if (this.definition) {
+      applyDemoCase(this.effectiveData, this.definition.demoCase)
+    } else {
+      for (const key in this.initData) {
+        this.effectiveData[key] = this.initData[key]
+      }
     }
     this.$emit('beforeOnDemo')
   }
 
   onReset(): void {
-    for (const key in this.data) {
-      this.data[key] = ''
+    if (this.definition) {
+      resetCalculationState(this.effectiveData, this.definition.fields)
+    } else {
+      for (const key in this.effectiveData) {
+        this.effectiveData[key] = ''
+      }
     }
     this.form.result = ''
     this.$emit('beforeOnReset')
   }
 
   onCalculate(): void {
+    if (this.definition) {
+      Promise.resolve(
+        this.definition.execute({
+          input: this.effectiveData,
+          setResult: (value: string) => {
+            this.form.result = value
+          }
+        })
+      ).then((result) => {
+        if (result === undefined || result === null) {
+          return
+        }
+
+        this.form.result = this.definition?.formatResult
+          ? this.definition.formatResult(result)
+          : String(result)
+      }).catch((error: Error) => {
+        console.error(error)
+      })
+    }
     this.$emit('beforeOnCalculate')
   }
 }

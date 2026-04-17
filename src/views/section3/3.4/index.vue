@@ -10,14 +10,8 @@
 <template>
   <div>
     <hycom-form
-      ref="template"
-      :title="title"
-      :data="data"
-      :init-data="initData"
-      :demo-content="demoContent"
-      :demo-result="demoResult"
-      :formulas="formulas"
-      @beforeOnCalculate="beforeOnCalculate"
+      :definition="definition"
+      :state="formState"
       @beforeOnDemo="beforeOnDemo"
       @beforeOnReset="beforeOnReset"
     >
@@ -66,6 +60,36 @@ import { Table2DLerp } from '@/hycom_lib/common'
 import TablePane from './components/TablePane.vue'
 import HycomForm from '@/components/HycomForm/index.vue'
 import DynamicSlkhsParams from './components/DynamicSLKHSParams.vue'
+import {
+  CalculationDefinition,
+  createCalculationState,
+  DemoCase,
+  FieldSchema
+} from '@/shared/calculations'
+
+const fields: FieldSchema[] = [
+  { key: '\\nabla', latex: '\\nabla', type: 'number' },
+  { key: 'C', latex: 'C', type: 'number' }
+]
+
+const demoCase: DemoCase = {
+  values: {
+    '\\nabla': 1862,
+    C: 15
+  },
+  description: '国内某水电站,水库校核水位1860.4m,正常蓄水位1856m,汛限水位1854m,中孔泄洪洞进水口为有压短管,有压短管出口高程804m,后接“龙抬头”无压泄洪洞,隧洞为城门洞形,隧洞断面尺寸为10mx15m,底坡为0.14,洞长206.39m,反弧末段高程1778.007m,反弧段后底坡为0.00472、洞长442.937m。进水口底板高程1804m,工作闸门尺寸8mx11m,流量系数μ=0.871,垂直收缩系数ε=0.914,混凝土衬砌糙率0.014,校核工况下泄量2310m3/s,求校核洪水时中孔泄洪洞沿程水面线(空化数)。',
+  expectedResult: '第1断面:水流空化数=0.57812,不需要设掺气坎;第2断面:水流空化数=0.28647,需要设掺气坎;第3断面:水流空化数=0.33424,不需要设掺气坎;第4断面:水流空化数=0.43886,不需要设掺气坎;'
+}
+
+const formulas = {
+  0: '\\sigma_i :第i个断面水流空化数;',
+  1: 'h_i :第i个计算断面处的动水压力水头,水柱高,m',
+  2: 'h_a :第i个计算断面处的大气压力水头,水柱高,m',
+  3: 'h_v :第i个断面水的汽化压力水头,水柱高,m',
+  4: 'v_i :第i个计算断面的平均流速,m',
+  5: '\\nabla :计算断面高程,m',
+  6: 'C :水温'
+}
 
 @Component({
   components: {
@@ -75,31 +99,49 @@ import DynamicSlkhsParams from './components/DynamicSLKHSParams.vue'
   }
 })
 export default class Chapter4Section42 extends Vue {
-  public title = '3.4 高流速水工隧洞沿程水流空化数';
   public explainText = '断面';
+  public formState = createCalculationState(fields)
+  public definition: CalculationDefinition = {
+    title: '3.4 高流速水工隧洞沿程水流空化数',
+    fields,
+    formulas,
+    demoCase,
+    execute: () => {
+      const tableLerp = new Table2DLerp()
+      const hv = tableLerp.arr(
+        this.table251Vertical,
+        this.table251Horizon,
+        this.table251Data,
+        0,
+        Number(this.formState.C)
+      )
 
-  public initData = {
-    '\\nabla': 1862,
-    C: 15
-  };
-  public data = {
-    '\\nabla': '',
-    C: ''
-  };
+      const slkhs = this.$refs.slkhs as any
+      const params = slkhs.params || []
 
-  public formulas = {
-    0: '\\sigma_i :第i个断面水流空化数;',
-    1: 'h_i :第i个计算断面处的动水压力水头,水柱高,m',
-    2: 'h_a :第i个计算断面处的大气压力水头,水柱高,m',
-    3: 'h_v :第i个断面水的汽化压力水头,水柱高,m',
-    4: 'v_i :第i个计算断面的平均流速,m',
-    5: '\\nabla :计算断面高程,m',
-    6: 'C :水温'
-  };
+      const hiList: number[] = []
+      const viList: number[] = []
+      params.forEach(function(elem: any) {
+        hiList.push(elem.hi)
+        viList.push(elem.vi)
+      })
 
-  public demoContent =
-    '国内某水电站,水库校核水位1860.4m,正常蓄水位1856m,汛限水位1854m,中孔泄洪洞进水口为有压短管,有压短管出口高程804m,后接“龙抬头”无压泄洪洞,隧洞为城门洞形,隧洞断面尺寸为10mx15m,底坡为0.14,洞长206.39m,反弧末段高程1778.007m,反弧段后底坡为0.00472、洞长442.937m。进水口底板高程1804m,工作闸门尺寸8mx11m,流量系数μ=0.871,垂直收缩系数ε=0.914,混凝土衬砌糙率0.014,校核工况下泄量2310m3/s,求校核洪水时中孔泄洪洞沿程水面线(空化数)。';
-  public demoResult = '第1断面:水流空化数=0.57812,不需要设掺气坎;第2断面:水流空化数=0.28647,需要设掺气坎;第3断面:水流空化数=0.33424,不需要设掺气坎;第4断面:水流空化数=0.43886,不需要设掺气坎;';
+      let outStr = ''
+      let counter = 1
+      const res = Chapter4.glssg_slkqhs(
+        Number(this.formState['\\nabla']),
+        hv,
+        hiList,
+        viList
+      )
+      res.forEach(function(elem: any) {
+        outStr += '第' + counter.toString() + '断面:' + elem + ';'
+        counter += 1
+      })
+
+      return outStr
+    }
+  }
 
   // -------table 251 data--------------------------
   public table251Data = [
@@ -132,43 +174,6 @@ export default class Chapter4Section42 extends Vue {
     slkhs.addFieldWithData(9.518, 24.27)
     slkhs.addFieldWithData(10.003, 23.093)
     slkhs.addFieldWithData(10.923, 21.148)
-  }
-
-  public beforeOnCalculate() {
-    let outStr = ''
-    let tableLerp = new Table2DLerp()
-    let hv = tableLerp.arr(
-      this.table251Vertical,
-      this.table251Horizon,
-      this.table251Data,
-      0,
-      +this.data.C
-    )
-
-    let slkhs = this.$refs.slkhs as any
-    slkhs.onParamsDataChange()
-
-    let hiList: any[] = []
-    let viList : any[] = []
-    this.paramData1.forEach(function(elem:any) {
-      hiList.push(elem.hi)
-      viList.push(elem.vi)
-    })
-
-    let counter = 1
-    let res = Chapter4.glssg_slkqhs(
-      +this.data['\\nabla'],
-      hv,
-      hiList,
-      viList
-    )
-    res.forEach(function(elem:any) {
-      outStr += '第' + counter.toString() + '断面:' + elem + ';'
-      counter += 1
-    })
-
-    let template = this.$refs.template as any
-    template.form.result = outStr
   }
 }
 </script>

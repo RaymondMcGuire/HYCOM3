@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import AV from 'leancloud-storage'
+import { adminService, FeedbackRecord } from '@/services/adminService'
 
 @Component({
   filters: {
@@ -69,22 +69,20 @@ import AV from 'leancloud-storage'
   }
 })
 export default class MailFormTable extends Vue {
-  private mailList: Array<Object> = []
+  private mailList: FeedbackRecord[] = []
   private title : string = '意见反馈列表'
   created() {
     this.fetchData()
   }
 
   private fetchData() {
-    var cql = 'select * from MailForms'
-    AV.Query.doCloudQuery(cql).then((results:any) => {
-      results.results.forEach((ele:any) => {
-        const attr = ele.attributes
-        this.mailList.push(attr)
+    adminService.fetchFeedbackForms()
+      .then((records) => {
+        this.mailList = records
       })
-    }, (error:any) => {
-      console.log(error)
-    })
+      .catch((error: Error) => {
+        console.log(error)
+      })
   }
 }
 </script>

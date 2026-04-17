@@ -78,8 +78,8 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Route } from 'vue-router'
 import { Form as ElForm } from 'element-ui'
-import AV from 'leancloud-storage'
-import { Identicon } from '../../identicon_lib/identicon'
+import { authService } from '@/services/authService'
+import { ServiceError } from '@/services/errors'
 
 @Component
 export default class Register extends Vue {
@@ -144,62 +144,18 @@ export default class Register extends Vue {
     this.$router.push({ path: '/login' })
   }
 
-  private handleUserIcon(usrId: string) {
-    const size = 420
-    const pixel = 70
-    const frame = 35
-    const patternSize = 5
-    const bgColor = 240
-
-    let canvas = document.createElement('canvas') as any
-    canvas.height = size
-    canvas.width = size
-    let context = canvas.getContext('2d')
-    let imageBuf = Identicon.Generate(
-      usrId,
-      patternSize,
-      size,
-      pixel,
-      frame,
-      bgColor
-    )
-
-    Identicon.Write2Canvas(context, imageBuf, size)
-
-    let data = canvas.toDataURL('image/png')
-
-    return data
-  }
-
-  private handleCopyUsrInfo() {
-    var usricon = this.handleUserIcon(this.registerForm.username)
-
-    var Forms = AV.Object.extend('UsrInfo')
-    var formObject = new Forms()
-    formObject
-      .save({
-        username: this.registerForm.username,
-        password: this.registerForm.password,
-        job: this.registerForm.work,
-        title: this.registerForm.level,
-        usericon: usricon
-      })
-      .then((object: any) => {})
-      .catch(() => {})
-  }
-
   private handleRegister() {
     (this.$refs.registerForm as ElForm).validate((valid: boolean) => {
       if (valid) {
         this.loading = true
-        AV.User.signUp(this.registerForm.username, this.registerForm.password, {
-          job: this.registerForm.work,
-          title: this.registerForm.level,
-          auth: 'D'
+        authService.register({
+          username: this.registerForm.username,
+          password: this.registerForm.password,
+          work: this.registerForm.work,
+          level: this.registerForm.level
         })
-          .then((user: any) => {
+          .then(() => {
             this.loading = false
-            this.handleCopyUsrInfo()
             this.$message({
               message: '创建用户成功!',
               type: 'success'
@@ -207,10 +163,10 @@ export default class Register extends Vue {
             this.registerForm.username = this.registerForm.password = this.registerForm.level = this.registerForm.work = this.registerForm.confirm_password = ''
             // this.loginPage()
           })
-          .catch(() => {
+          .catch((error: ServiceError) => {
             this.loading = false
             this.$message({
-              message: '创建用户失败!',
+              message: error.message || '创建用户失败!',
               type: 'error'
             })
           })

@@ -43,6 +43,38 @@ npm run preview
 npm run typecheck
 ```
 
+### 运行单元测试
+
+```bash
+npm run test:unit
+```
+
+### 运行端到端烟测
+
+```bash
+npm run test:e2e
+```
+
+首次运行 Playwright 需要安装浏览器：
+
+```bash
+npx playwright install chromium
+```
+
+### 运行时配置
+
+项目支持通过环境变量覆盖第三方服务配置，参考仓库根目录的 `.env.example`。
+
+常用变量包括：
+
+- `VITE_LC_APP_ID`
+- `VITE_LC_APP_KEY`
+- `VITE_LC_SERVER_URL`
+- `VITE_EMAILJS_SERVICE_ID`
+- `VITE_EMAILJS_TEMPLATE_ID`
+- `VITE_EMAILJS_PUBLIC_KEY`
+- `VITE_EMAILJS_ENABLED`
+
 ### 迁移说明
 
 - 本轮目标是先恢复现代化 Web 运行链。
