@@ -11,6 +11,7 @@ import Vue from 'vue'
 
 import 'normalize.css'
 import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 import SvgIcon from 'vue-svgicon'
 import '@/styles/index.scss'
 import '@/icons/components'
@@ -19,11 +20,9 @@ import '@/permission'
 import App from '@/App.vue'
 import store from '@/store'
 import router from '@/router'
-import '@/registerServiceWorker'
 
-import MathJax, { initMathJax, renderByMathjax } from 'mathjax-vue'
-
-const AV = require('leancloud-storage')
+import MathJax, { initMathJax, renderByMathjax } from '@/plugins/mathjax'
+import AV from 'leancloud-storage'
 AV.init({
   // serverURLs:'https://avoscloud.com',
   // appId: 'vXHukUzIVdJ2vokL1Vm8cqv2-MdYXbMMI',

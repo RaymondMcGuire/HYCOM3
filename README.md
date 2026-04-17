@@ -1,34 +1,53 @@
-## 如何设置以及启动项目
+## HYCOM3
 
-### 环境配置
+这是一个以 `src/hycom_lib` 为核心计算层的水力学计算应用。本轮已将 Web 构建入口切换到 Vite，用于替代原来的 Vue CLI 3 运行链。
 
-- 安装nvm https://github.com/coreybutler/nvm-windows/releases
-- nvm install 18.19.0
-- nvm use 18.19.0
-- npm install -g yarn
-- yarn config set ignore-engines true
+### 推荐环境
+
+- Node.js：推荐 `24 LTS`，最低 `20.x`
+- npm：`10.x`
 
 ### 安装依赖
 
-yarn install
+```bash
+npm install
+```
 
-### 启动本地开发环境(自带热启动)
+### 启动现代化 Web 开发环境
 
-yarn serve
+```bash
+npm run dev
+```
 
-### 代码格式化
+默认地址：
 
-yarn run lint --fix
+```text
+http://127.0.0.1:5173
+```
 
-### 构建生产环境 (自带压缩)
+### 构建生产包
 
-yarn build
+```bash
+npm run build
+```
 
-### 发布 win 版到 github
+### 本地预览构建结果
 
-set NODE_OPTIONS=--openssl-legacy-provider
+```bash
+npm run preview
+```
 
-yarn run electron:publish
+### 类型检查
+
+```bash
+npm run typecheck
+```
+
+### 迁移说明
+
+- 本轮目标是先恢复现代化 Web 运行链。
+- 旧的 Vue CLI / Jest / Cypress / Electron 依赖已经从主安装路径中移除，避免它们在新环境下阻塞 `npm install`。
+- `src/background.ts` 和旧 Electron 相关文件仍保留在仓库中，后续会单独迁移。
 
 ### 项目地址
 

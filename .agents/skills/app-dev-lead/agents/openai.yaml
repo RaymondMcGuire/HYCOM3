@@ -1,0 +1,6 @@
+interface:
+  display_name: "应用开发总控"
+  short_description: "Codex 主入口，负责 Phase 0-5、worker 派发、review 回环和收尾。"
+  default_prompt: "请按完整开发流程处理这个需求，从 Phase 0 开始。"
+policy:
+  allow_implicit_invocation: false

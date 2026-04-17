@@ -14,12 +14,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import $ from 'jquery'
+import 'jquery.ripples'
 import { UserModule } from '@/store/modules/user'
 import { removeToken } from '@/utils/auth'
-
-const $ = require('jquery')
-const ripple = require('jquery.ripples')
-const AV = require('leancloud-storage')
 
 @Component
 export default class DashboardEditor extends Vue {

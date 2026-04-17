@@ -1,0 +1,366 @@
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+4 │ @import "element-ui/packages/theme-chalk/src/index";
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    src\styles\index.scss 4:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+6 │ @import './variables.scss';
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\styles\index.scss 6:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+7 │ @import './mixin.scss';
+  │         ^^^^^^^^^^^^^^
+  ╵
+    src\styles\index.scss 7:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+8 │ @import './transition.scss';
+  │         ^^^^^^^^^^^^^^^^^^^
+  ╵
+    src\styles\index.scss 8:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+9 │ @import './svgicon.scss';
+  │         ^^^^^^^^^^^^^^^^
+  ╵
+    src\styles\index.scss 9:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "@/styles/mixin.scss";
+  │         ^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    src\views\layout\Layout.vue 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+3 │ @import "@/styles/variables.scss";
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    src\views\layout\Layout.vue 3:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "@/styles/variables.scss";
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    src\views\layout\components\Sidebar\index.vue 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "@/styles/variables.scss";
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    src\views\layout\components\Sidebar\SidebarItem.vue 2:9  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+24 │ $--color-primary-light-1: mix($--color-white, $--color-primary, 10%) !default; /* 53a8ff */
+   │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\common\var.scss 24:27       @import
+    node_modules\element-ui\packages\theme-chalk\src\common\transition.scss 1:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\base.scss 1:9               @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 1:9              @import
+    src\styles\index.scss 4:9                                                    root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+25 │ $--color-primary-light-2: mix($--color-white, $--color-primary, 20%) !default; /* 66b1ff */
+   │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\common\var.scss 25:27       @import
+    node_modules\element-ui\packages\theme-chalk\src\common\transition.scss 1:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\base.scss 1:9               @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 1:9              @import
+    src\styles\index.scss 4:9                                                    root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+26 │ $--color-primary-light-3: mix($--color-white, $--color-primary, 30%) !default; /* 79bbff */
+   │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\common\var.scss 26:27       @import
+    node_modules\element-ui\packages\theme-chalk\src\common\transition.scss 1:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\base.scss 1:9               @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 1:9              @import
+    src\styles\index.scss 4:9                                                    root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+27 │ $--color-primary-light-4: mix($--color-white, $--color-primary, 40%) !default; /* 8cc5ff */
+   │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\common\var.scss 27:27       @import
+    node_modules\element-ui\packages\theme-chalk\src\common\transition.scss 1:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\base.scss 1:9               @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 1:9              @import
+    src\styles\index.scss 4:9                                                    root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+28 │ $--color-primary-light-5: mix($--color-white, $--color-primary, 50%) !default; /* a0cfff */
+   │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\common\var.scss 28:27       @import
+    node_modules\element-ui\packages\theme-chalk\src\common\transition.scss 1:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\base.scss 1:9               @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 1:9              @import
+    src\styles\index.scss 4:9                                                    root stylesheet
+
+DEPRECATION WARNING [slash-div]: Using / for division outside of calc() is deprecated and will be removed in Dart Sass 2.0.0.
+
+Recommendation: math.div(1, 5) or calc(1 / 5)
+
+More info and automated migrator: https://sass-lang.com/d/slash-div
+
+    ╷
+487 │ $--group-option-flex: 0 0 (1/5) * 100% !default;
+    │                            ^^^
+    ╵
+    node_modules\element-ui\packages\theme-chalk\src\common\var.scss 487:28      @import
+    node_modules\element-ui\packages\theme-chalk\src\common\transition.scss 1:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\base.scss 1:9               @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 1:9              @import
+    src\styles\index.scss 4:9                                                    root stylesheet
+
+DEPRECATION WARNING [slash-div]: Using / for division outside of calc() is deprecated and will be removed in Dart Sass 2.0.0.
+
+Recommendation: math.div($--tooltip-arrow-size, 2) or calc($--tooltip-arrow-size / 2)
+
+More info and automated migrator: https://sass-lang.com/d/slash-div
+
+   ╷
+32 │     margin-right: #{$--tooltip-arrow-size / 2};
+   │                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 32:21         @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 4:1           @import
+    node_modules\element-ui\packages\theme-chalk\src\select-dropdown.scss 3:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 4:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [slash-div]: Using / for division outside of calc() is deprecated and will be removed in Dart Sass 2.0.0.
+
+Recommendation: math.div($--tooltip-arrow-size, 2) or calc($--tooltip-arrow-size / 2)
+
+More info and automated migrator: https://sass-lang.com/d/slash-div
+
+   ╷
+51 │     margin-right: #{$--tooltip-arrow-size / 2};
+   │                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 51:21         @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 4:1           @import
+    node_modules\element-ui\packages\theme-chalk\src\select-dropdown.scss 3:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 4:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [slash-div]: Using / for division outside of calc() is deprecated and will be removed in Dart Sass 2.0.0.
+
+Recommendation: math.div($--tooltip-arrow-size, 2) or calc($--tooltip-arrow-size / 2)
+
+More info and automated migrator: https://sass-lang.com/d/slash-div
+
+   ╷
+70 │     margin-bottom: #{$--tooltip-arrow-size / 2};
+   │                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 70:22         @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 4:1           @import
+    node_modules\element-ui\packages\theme-chalk\src\select-dropdown.scss 3:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 4:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [slash-div]: Using / for division outside of calc() is deprecated and will be removed in Dart Sass 2.0.0.
+
+Recommendation: math.div($--tooltip-arrow-size, 2) or calc($--tooltip-arrow-size / 2)
+
+More info and automated migrator: https://sass-lang.com/d/slash-div
+
+   ╷
+89 │     margin-bottom: #{$--tooltip-arrow-size / 2};
+   │                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 89:22         @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\popper.scss 4:1           @import
+    node_modules\element-ui\packages\theme-chalk\src\select-dropdown.scss 3:9  @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 4:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [function-units]: $weight: Passing a number without unit % (0) is deprecated.
+
+To preserve current behavior: $weight * 1%
+
+More info: https://sass-lang.com/d/function-units
+
+  ╷
+7 │   color: mix($--tag-primary-color, $--color-white, $fontColorWeight);
+  │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 7:10             genTheme()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 127:5            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 112:7  m()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 126:3            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 94:1             @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 6:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [function-units]: $weight: Passing a number without unit % (0) is deprecated.
+
+To preserve current behavior: $weight * 1%
+
+More info: https://sass-lang.com/d/function-units
+
+   ╷
+14 │     color: mix($--tag-primary-color, $--color-white, $fontColorWeight);
+   │            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 14:12            genTheme()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 127:5            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 112:7  m()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 126:3            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 94:1             @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 6:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [function-units]: $weight: Passing a number without unit % (0) is deprecated.
+
+To preserve current behavior: $weight * 1%
+
+More info: https://sass-lang.com/d/function-units
+
+   ╷
+24 │     color: mix($--tag-info-color, $--color-white, $fontColorWeight);
+   │            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 24:12            genTheme()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 127:5            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 112:7  m()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 126:3            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 94:1             @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 6:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [function-units]: $weight: Passing a number without unit % (0) is deprecated.
+
+To preserve current behavior: $weight * 1%
+
+More info: https://sass-lang.com/d/function-units
+
+   ╷
+31 │       color: mix($--tag-info-color, $--color-white, $fontColorWeight);
+   │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 31:14            genTheme()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 127:5            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 112:7  m()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 126:3            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 94:1             @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 6:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+DEPRECATION WARNING [function-units]: $weight: Passing a number without unit % (0) is deprecated.
+
+To preserve current behavior: $weight * 1%
+
+More info: https://sass-lang.com/d/function-units
+
+   ╷
+42 │     color: mix($--tag-success-color, $--color-white, $fontColorWeight);
+   │            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 42:12            genTheme()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 127:5            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 112:7  m()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 126:3            @content
+    node_modules\element-ui\packages\theme-chalk\src\mixins\mixins.scss 74:5   b()
+    node_modules\element-ui\packages\theme-chalk\src\tag.scss 94:1             @import
+    node_modules\element-ui\packages\theme-chalk\src\select.scss 6:9           @import
+    node_modules\element-ui\packages\theme-chalk\src\pagination.scss 4:9       @import
+    node_modules\element-ui\packages\theme-chalk\src\index.scss 2:9            @import
+    src\styles\index.scss 4:9                                                  root stylesheet
+
+WARNING: 462 repetitive deprecation warnings omitted.
+Run in verbose mode to see all warnings.
+
+^C^C

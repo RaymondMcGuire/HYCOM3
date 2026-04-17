@@ -145,7 +145,7 @@ import { crossSectionShapeType } from '@/hycom_lib/common'
   }
 })
 
-export default class extends Vue {
+export default class DynamicJKDParams extends Vue {
     @Prop({ default: '' }) explainText!: string;
   @Prop({ default: true }) dynamicBtn!: boolean;
 

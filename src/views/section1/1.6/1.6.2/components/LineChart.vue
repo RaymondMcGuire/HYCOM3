@@ -65,7 +65,7 @@ ChartJS.register(
   }
 })
 
-export default class extends Vue {
+export default class LineChart extends Vue {
 @Prop({ default: 'line-chart' }) chartId!: string;
 @Prop({ default: 'label' }) datasetIdKey!: string;
 @Prop({ default: 400 }) width!: number;

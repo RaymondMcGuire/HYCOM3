@@ -105,7 +105,7 @@
 import emailjs from 'emailjs-com'
 import { Component, Vue, Emit } from 'vue-property-decorator'
 import { Form as ElForm } from 'element-ui'
-const AV = require('leancloud-storage')
+import AV from 'leancloud-storage'
 
 const validateEmail = (rule: any, value: string, callback: any) => {
   const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/

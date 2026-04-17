@@ -108,7 +108,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
   }
 })
 
-export default class extends Vue {
+export default class DynamicYXHWGParams extends Vue {
     @Prop({ default: '' }) explainText!: string;
   @Prop({ default: true }) dynamicBtn!: boolean;
 

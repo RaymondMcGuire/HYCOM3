@@ -74,7 +74,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
   name: 'DynamicRangeParams'
 })
 
-export default class extends Vue {
+export default class DynamicRangeParams extends Vue {
     @Prop({ default: '' }) explainText!: string;
   @Prop({ default: true }) dynamicBtn!: boolean;
   @Prop({ default: 1 }) maxValue!: number;

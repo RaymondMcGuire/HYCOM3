@@ -32,7 +32,6 @@ export default new Router({
       return { x: 0, y: 0 }
     }
   },
-  base: process.env.BASE_URL,
   routes: [
     {
       path: '/login',

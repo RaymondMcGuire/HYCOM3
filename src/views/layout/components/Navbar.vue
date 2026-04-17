@@ -65,10 +65,9 @@
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Hamburger from '@/components/Hamburger/index.vue'
 import { Component, Vue } from 'vue-property-decorator'
+import AV from 'leancloud-storage'
 import { AppModule } from '@/store/modules/app'
 import { UserModule } from '@/store/modules/user'
-
-const AV = require('leancloud-storage')
 
 @Component({
   components: {

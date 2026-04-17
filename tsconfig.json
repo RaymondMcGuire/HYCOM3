@@ -3,6 +3,7 @@
     "target": "esnext",
     "module": "esnext",
     "strict": true,
+    "skipLibCheck": true,
     "jsx": "preserve",
     "importHelpers": true,
     "noImplicitAny": false,
@@ -13,11 +14,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "resolveJsonModule": true,
-    "types": [
-      "node",
-      "jest",
-      "webpack-env"
-    ],
+    "types": ["vite/client"],
     "paths": {
       "@/*": [
         "src/*"
@@ -33,11 +30,15 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/**/*.vue"
   ],
+  "vueCompilerOptions": {
+    "target": 2.7
+  },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/background.ts",
+    "src/registerServiceWorker.ts",
+    "tests"
   ]
 }

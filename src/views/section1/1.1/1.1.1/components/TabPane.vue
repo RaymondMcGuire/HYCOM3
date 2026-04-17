@@ -123,7 +123,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component({
   name: 'TabPane'
 })
-export default class extends Vue {
+export default class TabPane extends Vue {
   @Prop({ default: 't1' }) private type!: string;
 
   data() {

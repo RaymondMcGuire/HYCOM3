@@ -143,7 +143,7 @@ import { curveDoorStatusType } from '@/hycom_lib/common'
   }
 })
 
-export default class extends Vue {
+export default class DynamicHXGZMParams extends Vue {
     @Prop({ default: '' }) explainText!: string;
   @Prop({ default: true }) dynamicBtn!: boolean;
 

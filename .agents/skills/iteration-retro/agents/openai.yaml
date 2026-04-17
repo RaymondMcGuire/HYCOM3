@@ -1,0 +1,6 @@
+interface:
+  display_name: "迭代收尾"
+  short_description: "独立入口，用于单独执行 Phase 5。"
+  default_prompt: "请按 Phase 5 对这轮工作做 retro 和技术债清扫。"
+policy:
+  allow_implicit_invocation: false

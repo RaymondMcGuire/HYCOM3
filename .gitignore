@@ -7,7 +7,6 @@ node_modules
 /tests/**/coverage/
 
 # local env files
-package-lock.json
 .env.local
 .env.*.local
 

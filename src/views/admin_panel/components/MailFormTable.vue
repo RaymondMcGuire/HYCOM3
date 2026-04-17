@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-const AV = require('leancloud-storage')
+import AV from 'leancloud-storage'
 
 @Component({
   filters: {

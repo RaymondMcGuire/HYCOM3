@@ -72,8 +72,6 @@ export default class SideBar extends Vue {
 </style>
 
 <style lang="scss" scoped>
-@import "src/styles/variables.scss";
-
 .el-menu {
   border: none;
   height: 100%;

@@ -8,6 +8,7 @@
  * Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 import request from '@/utils/request'
+import wxIcon from '@/assets/images/icon/wx_icon.png'
 
 export const login: any = (username: string, password: string) =>
   request({
@@ -36,13 +37,13 @@ export const users: { [index: string]: any } = {
   'admin-token': {
     roles: ['admin'],
     introduction: '超级用户',
-    avatar: require('../assets/images/icon/wx_icon.png'),
+    avatar: wxIcon,
     name: '超级用户'
   },
   'developer-token': {
     roles: ['developer'],
     introduction: '开发者',
-    avatar: require('../assets/images/icon/wx_icon.png'),
+    avatar: wxIcon,
     name: '开发者'
   }
 }

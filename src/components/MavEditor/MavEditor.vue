@@ -82,13 +82,13 @@ externalLink={
   hljs_js: false,
   hljs_lang: false,
   markdown_css: function() {
-    return 'https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css'
+    return '/vendor/mavon-editor/markdown/github-markdown.min.css'
   },
   katex_js: function() {
-    return 'https://cdn.bootcdn.net/ajax/libs/KaTeX/0.15.3/katex.min.js'
+    return '/vendor/mavon-editor/katex/katex.min.js'
   },
   katex_css: function() {
-    return 'https://cdn.bootcdn.net/ajax/libs/KaTeX/0.15.3/katex.min.css'
+    return '/vendor/mavon-editor/katex/katex.min.css'
   }
 };
 

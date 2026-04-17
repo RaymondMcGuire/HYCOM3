@@ -193,7 +193,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import VueParamaters from '@/components/VueParamaters/index.vue'
 import ParamExplain from './components/ParamExplain.vue'
 import { syyType, shapeType, tfyType, jkdkbyType } from '@/hycom_lib/common'
-import { MathJax } from 'mathjax-vue'
+import { MathJax } from '@/plugins/mathjax'
 
 @Component({
   components: {

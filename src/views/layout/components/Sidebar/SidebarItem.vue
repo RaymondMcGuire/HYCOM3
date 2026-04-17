@@ -57,11 +57,37 @@
 </template>
 
 <script lang="ts">
-import path from 'path'
 import { Route } from 'vue-router'
 import { isExternal } from '@/utils/validate'
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import AppLink from './Link.vue'
+
+function resolveRoutePath(basePath: string, routePath: string) {
+  if (isExternal(routePath)) {
+    return routePath
+  }
+
+  if (isExternal(basePath)) {
+    return basePath
+  }
+
+  const pathSegments = routePath.startsWith('/') ? [] : basePath.split('/').filter(Boolean)
+
+  routePath.split('/').forEach((segment) => {
+    if (!segment || segment === '.') {
+      return
+    }
+
+    if (segment === '..') {
+      pathSegments.pop()
+      return
+    }
+
+    pathSegments.push(segment)
+  })
+
+  return `/${pathSegments.join('/')}`
+}
 
 @Component({
   // Set 'name' here to prevent uglifyjs from causing recursive component not work
@@ -105,16 +131,13 @@ export default class SidebarItem extends Vue {
   }
 
   private resolvePath(routePath: string) {
-    if (isExternal(routePath)) {
-      return routePath
-    }
-    return path.resolve(this.basePath, routePath)
+    return resolveRoutePath(this.basePath, routePath)
   }
 }
 </script>
 
 <style lang="scss">
-@import "src/styles/variables.scss";
+@use "@/styles/variables.scss" as *;
 
 .el-submenu.is-active > .el-submenu__title {
   color: $subMenuActiveText !important;

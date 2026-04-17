@@ -78,9 +78,8 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Route } from 'vue-router'
 import { Form as ElForm } from 'element-ui'
+import AV from 'leancloud-storage'
 import { Identicon } from '../../identicon_lib/identicon'
-
-const AV = require('leancloud-storage')
 
 @Component
 export default class Register extends Vue {
@@ -222,6 +221,8 @@ export default class Register extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@use "sass:color";
+
 $deep-blue: #0f4c75;
 $medium-blue: #3282b8;
 $light-blue: #bbe1fa;
@@ -347,7 +348,7 @@ $light-blue: #bbe1fa;
       color: $deep-blue;
 
       &:hover {
-        background-color: darken($light-blue, 10%);
+        background-color: color.adjust($light-blue, $lightness: -10%);
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
       }
@@ -359,7 +360,7 @@ $light-blue: #bbe1fa;
       margin-top: 10px;
 
       &:hover {
-        color: darken($light-blue, 10%);
+        color: color.adjust($light-blue, $lightness: -10%);
       }
     }
   }

@@ -183,6 +183,13 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import graph412_1 from '@/assets/images/graph/412-1.png'
+import graph412_2 from '@/assets/images/graph/412-2.png'
+import graph412_3 from '@/assets/images/graph/412-3.png'
+import graph412_4 from '@/assets/images/graph/412-4.png'
+import graph412_5 from '@/assets/images/graph/412-5.png'
+import graph412_6 from '@/assets/images/graph/412-6.png'
+import graph412_7 from '@/assets/images/graph/412-7.png'
 
 import { crossSectionShapeType } from '@/hycom_lib/common'
 
@@ -193,7 +200,7 @@ import { crossSectionShapeType } from '@/hycom_lib/common'
   }
 })
 
-export default class extends Vue {
+export default class DynamicJKLWSSelectParams extends Vue {
     @Prop({ default: '' }) explainText!: string;
   @Prop({ default: true }) dynamicBtn!: boolean;
 
@@ -221,43 +228,43 @@ export default class extends Vue {
       id: 1,
       label: '栅条形状1',
       value: 2.42,
-      img: require('@/assets/images/graph/412-1.png')
+      img: graph412_1
     },
     {
       id: 2,
       label: '栅条形状2',
       value: 1.83,
-      img: require('@/assets/images/graph/412-2.png')
+      img: graph412_2
     },
     {
       id: 3,
       label: '栅条形状3',
       value: 1.67,
-      img: require('@/assets/images/graph/412-3.png')
+      img: graph412_3
     },
     {
       id: 4,
       label: '栅条形状4',
       value: 1.035,
-      img: require('@/assets/images/graph/412-4.png')
+      img: graph412_4
     },
     {
       id: 5,
       label: '栅条形状5',
       value: 0.92,
-      img: require('@/assets/images/graph/412-5.png')
+      img: graph412_5
     },
     {
       id: 6,
       label: '栅条形状6',
       value: 0.76,
-      img: require('@/assets/images/graph/412-6.png')
+      img: graph412_6
     },
     {
       id: 7,
       label: '栅条形状7',
       value: 1.79,
-      img: require('@/assets/images/graph/412-7.png')
+      img: graph412_7
     }
 
   ];

@@ -7,7 +7,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:11
+      - image: cimg/node:24.11
 
     working_directory: ~/vue-typescript-admin-template
 
@@ -21,11 +21,11 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: yarn install
+      - run: npm install
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: yarn lint && yarn build
+      - run: npm run typecheck && npm run build

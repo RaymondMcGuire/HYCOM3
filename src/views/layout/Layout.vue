@@ -50,8 +50,8 @@ export default class Layout extends mixins(ResizeMixin) {
 </script>
 
 <style lang="scss" scoped>
-  @import "src/styles/mixin.scss";
-  @import "src/styles/variables.scss";
+  @use "@/styles/mixin.scss" as *;
+  @use "@/styles/variables.scss" as *;
 
   .app-wrapper {
     @include clearfix;
