@@ -1,14 +1,12 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import { IAppState } from './modules/app'
-import { IUserState } from './modules/user'
-
-Vue.use(Vuex)
+import { createPinia } from 'pinia'
+import type { IAppState } from '@/store/modules/app'
+import type { IUserState } from '@/store/modules/user'
 
 export interface IRootState {
   app: IAppState;
   user: IUserState;
 }
 
-// Declare empty store first, dynamically register all modules later.
-export default new Vuex.Store<IRootState>({})
+const store = createPinia()
+
+export default store

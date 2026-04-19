@@ -52,14 +52,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 
-@Component({
-  name: 'TablePane'
-})
-export default class TablePane extends Vue {
-  @Prop({ default: 't1' }) public type!: string;
-
+export default defineComponent({
+  name: 'TablePane',
+  props: {
+    type: {
+      type: String,
+      default: 't1'
+    }
+  },
   data() {
     return {
       table433: [
@@ -69,21 +71,18 @@ export default class TablePane extends Vue {
           b: '1:5.5',
           c: '1:6.5'
         },
-
         {
           name: '检修门前顶部压板斜率S2',
           a: '1:4',
           b: '1:5',
           c: '1:6'
         },
-
         {
           name: '垂直收缩系数ε',
           a: 0.895,
           b: 0.914,
           c: 0.918
         },
-
         {
           name: '流速系数φ',
           a: 0.963,
@@ -99,5 +98,5 @@ export default class TablePane extends Vue {
       ]
     }
   }
-}
+})
 </script>

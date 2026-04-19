@@ -1,125 +1,195 @@
 <template>
   <div id="mav-editor">
-    <el-row :gutter="20">
-      <el-col
-        :span="8"
-        style="text-align: center"
-      >
+    <app-grid
+      class="editor-toolbar"
+      columns="repeat(3, minmax(0, 1fr))"
+      min-column="120px"
+      gap="20px"
+    >
+      <div class="editor-toolbar__cell">
         <el-button
           type="primary"
           @click="onMavEdit"
         >
           编辑
         </el-button>
-      </el-col>
+      </div>
 
-      <el-col
-        :span="8"
-        style="text-align: center"
-      >
+      <div class="editor-toolbar__cell">
         <el-button
           type="primary"
           @click="onMavPreview"
         >
           预览
         </el-button>
-      </el-col>
-      <el-col
-        :span="8"
-        style="text-align: center"
-      >
+      </div>
+
+      <div class="editor-toolbar__cell">
         <el-button
           type="primary"
-          @click="onHtml2PDF()"
+          @click="onHtml2PDF"
         >
           生成PDF
         </el-button>
-      </el-col>
-    </el-row>
+      </div>
+    </app-grid>
 
     <br>
 
-    <mavon-editor
-      class="md"
-      :value="config.value"
-      :subfield="config.subfield"
-      :default-open="config.defaultOpen"
-      :toolbars-flag="config.toolbarsFlag"
-      :editable="config.editable"
-      :scroll-style="config.scrollStyle"
-      :external-link="externalLink"
-      @change="change"
-    />
+    <app-grid
+      v-if="showEditor || showPreview"
+      class="editor-layout"
+      :columns="showEditor && showPreview ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)'"
+      gap="20px"
+    >
+      <div v-if="showEditor">
+        <el-input
+          :value="renderSource"
+          class="editor-input"
+          type="textarea"
+          :rows="24"
+          resize="vertical"
+          @input="onInput"
+        />
+      </div>
 
-    <html2pdf
-      ref="h2p"
-      :html-content="htmlContent"
-      :config="config"
-    />
+      <div v-if="showPreview">
+        <div
+          ref="preview"
+          class="preview-panel"
+          v-html="renderSource"
+        />
+      </div>
+    </app-grid>
+
   </div>
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
+import { browserPdfExportAdapter } from '@/integrations/pdf/adapter'
+import { renderByMathjax } from '@/plugins/mathjax'
+import AppGrid from '@/shared/components/layout/AppGrid.vue'
 
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import Html2pdf from '@/components/Html2pdf/Html2pdf.vue'
-import mavonEditor from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
-
-Vue.use(mavonEditor)
-
-@Component({
+export default defineComponent({
+  name: 'MavEditor',
   components: {
-    Html2pdf
+    AppGrid
+  },
+  props: {
+    config: {
+      type: Object,
+      required: true
+    }
+  },
+  data() {
+    return {
+      syncTimer: null as number | null
+    }
+  },
+  computed: {
+    renderSource(): string {
+      return String((this.config && this.config.value) || '')
+    },
+    showEditor(): boolean {
+      return Boolean(this.config?.subfield) || this.config?.defaultOpen !== 'preview'
+    },
+    showPreview(): boolean {
+      return Boolean(this.config?.subfield) || this.config?.defaultOpen === 'preview'
+    }
+  },
+  watch: {
+    renderSource() {
+      this.schedulePreviewSync()
+    },
+    showEditor() {
+      this.schedulePreviewSync()
+    },
+    showPreview() {
+      this.schedulePreviewSync()
+    }
+  },
+  mounted() {
+    this.schedulePreviewSync()
+  },
+  beforeUnmount() {
+    if (this.syncTimer !== null) {
+      window.clearTimeout(this.syncTimer)
+    }
+  },
+  methods: {
+    schedulePreviewSync() {
+      if (this.syncTimer !== null) {
+        window.clearTimeout(this.syncTimer)
+      }
+
+      this.syncTimer = window.setTimeout(() => {
+        void this.syncPreview()
+      }, 60)
+    },
+    async syncPreview() {
+      await this.$nextTick()
+
+      const preview = this.$refs.preview as HTMLElement | undefined
+      if (!preview) {
+        return
+      }
+
+      try {
+        await renderByMathjax(preview)
+      } catch (error) {
+        console.warn('[MavEditor]', error)
+      }
+    },
+    onInput(value: string) {
+      this.config.value = value
+      this.schedulePreviewSync()
+    },
+    async onHtml2PDF() {
+      await browserPdfExportAdapter.generatePdf(this.renderSource, this.config)
+    },
+    onMavEdit() {
+      this.config.defaultOpen = ''
+      this.config.subfield = true
+      this.config.editable = true
+      this.config.toolbarsFlag = true
+      this.schedulePreviewSync()
+    },
+    onMavPreview() {
+      this.config.defaultOpen = 'preview'
+      this.config.subfield = false
+      this.config.editable = false
+      this.config.toolbarsFlag = false
+      this.schedulePreviewSync()
+    }
   }
 })
-
-export default class MavEditor extends Vue {
-         @Prop() config!: any
-
-externalLink={
-  hljs_css: false,
-  hljs_js: false,
-  hljs_lang: false,
-  markdown_css: function() {
-    return '/vendor/mavon-editor/markdown/github-markdown.min.css'
-  },
-  katex_js: function() {
-    return '/vendor/mavon-editor/katex/katex.min.js'
-  },
-  katex_css: function() {
-    return '/vendor/mavon-editor/katex/katex.min.css'
-  }
-};
-
- private htmlContent:any = ''
-
- mounted() {
-
- }
-
- private onHtml2PDF() {
-   let h2p = this.$refs.h2p as any
-   h2p.generatePdf()
- }
-
- private onMavEdit() {
-   this.config.defaultOpen = ''
-   this.config.subfield = true
-   this.config.editable = true
-   this.config.toolbarsFlag = true
- }
-
- private onMavPreview() {
-   this.config.defaultOpen = 'preview'
-   this.config.subfield = false
-   this.config.editable = false
-   this.config.toolbarsFlag = false
- }
-
-  @Watch('change')
- change(val:string, render:string) {
-   this.htmlContent = render
- }
-}
 </script>
+
+<style lang="scss" scoped>
+.editor-toolbar__cell {
+  text-align: center;
+}
+
+.editor-layout {
+  margin-bottom: 20px;
+}
+
+.editor-input :deep(textarea) {
+  font-family: Consolas, 'Courier New', monospace;
+  line-height: 1.6;
+}
+
+.preview-panel {
+  min-height: 460px;
+  padding: 16px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  background: #fff;
+  overflow-x: auto;
+}
+
+.preview-panel :deep(p) {
+  line-height: 1.8;
+}
+</style>

@@ -45,15 +45,17 @@
   </div>
 </template>
 
-<script lang='ts'>
-import { Component, Vue } from 'vue-property-decorator'
+<script lang="ts">
+import { defineComponent } from 'vue'
 
-@Component
-export default class NotFound extends Vue {
-  get message() {
-    return '404 此页面不存在'
+export default defineComponent({
+  name: 'NotFoundPage',
+  computed: {
+    message(): string {
+      return '404 此页面不存在'
+    }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

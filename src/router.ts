@@ -1,17 +1,5 @@
-/*
- * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2020-08-26 19:35:46
- * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2022-08-07 02:20:24
- * @FilePath: \hycom3.0\src\router.ts
- * @Description:
- * Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
- */
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { routes } from '@/app/router/routes'
-
-Vue.use(Router)
 
 /*
   redirect:                      if `redirect: noredirect`, it won't redirect if click on the breadcrumb
@@ -23,14 +11,16 @@ Vue.use(Router)
   }
 */
 
-export default new Router({
-  // mode: 'history',  // Disabled due to Github Pages doesn't support this, enable this if you need.
-  scrollBehavior: (to, from, savedPosition) => {
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      return { x: 0, y: 0 }
-    }
-  },
-  routes
-})
+export function createAppRouter() {
+  return createRouter({
+    history: createWebHashHistory(),
+    scrollBehavior: (to, from, savedPosition) => {
+      if (savedPosition) {
+        return savedPosition
+      } else {
+        return { left: 0, top: 0 }
+      }
+    },
+    routes
+  })
+}

@@ -16,15 +16,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { isExternal } from '@/utils/validate'
 
-@Component
-export default class Link extends Vue {
-  @Prop({ required: true }) private to!: string;
-
-  private isExternalLink(routePath: string) {
-    return isExternal(routePath)
+export default defineComponent({
+  name: 'SidebarLink',
+  props: {
+    to: {
+      type: String,
+      required: true
+    }
+  },
+  methods: {
+    isExternalLink(routePath: string) {
+      return isExternal(routePath)
+    }
   }
-}
+})
 </script>

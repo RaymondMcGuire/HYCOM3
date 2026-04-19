@@ -7,17 +7,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
 import VueParamaters from '@/components/VueParamaters/index.vue'
 
-@Component({
+export default defineComponent({
+  name: 'ParamExplain',
   components: {
     VueParamaters
-
+  },
+  props: {
+    formulas: {
+      type: Object as PropType<Record<string, any>>,
+      required: true
+    }
   }
 })
-export default class ParamExplain extends Vue {
-  @Prop() formulas!: Object;
-}
-
 </script>

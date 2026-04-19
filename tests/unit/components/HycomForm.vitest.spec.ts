@@ -55,4 +55,67 @@ describe('components/HycomForm', () => {
 
     expect((wrapper.vm as any).form.result).toBe('sum=5')
   })
+
+  it('renders structured result schema when a definition returns object output', async () => {
+    const definition: CalculationDefinition = {
+      title: 'Structured Calculator',
+      fields: [
+        { key: 'a', latex: 'a', type: 'number' },
+        { key: 'b', latex: 'b', type: 'number' }
+      ],
+      formulas: {
+        0: 'a+b'
+      },
+      result: {
+        summary: [
+          { key: 'sum', label: 'Sum' }
+        ],
+        lists: [
+          {
+            key: 'steps',
+            label: 'Steps',
+            itemLabel: (item, index) => `Step ${index + 1}`,
+            itemValue: (item) => String((item as any).text)
+          }
+        ]
+      },
+      execute: ({ input }) => ({
+        sum: Number(input.a) + Number(input.b),
+        steps: [
+          { text: `${input.a}+${input.b}` }
+        ],
+        raw: `sum=${Number(input.a) + Number(input.b)}`
+      }),
+      formatResult: (result: any) => result.raw
+    }
+
+    const state = createCalculationState(definition.fields)
+    state.a = 2
+    state.b = 3
+
+    const wrapper = mount(HycomForm, {
+      propsData: {
+        definition,
+        state
+      },
+      stubs: {
+        MathJax: {
+          props: ['latex'],
+          template: '<span>{{ latex }}</span>'
+        },
+        ParamExplain: {
+          props: ['formulas'],
+          template: '<div class="formula-stub">{{ Object.keys(formulas || {}).length }}</div>'
+        }
+      }
+    })
+
+    ;(wrapper.vm as any).onCalculate()
+    await Promise.resolve()
+    await wrapper.vm.$nextTick()
+
+    expect((wrapper.vm as any).form.result).toBe('sum=5')
+    expect(wrapper.find('.result-summary-value').text()).toBe('5')
+    expect(wrapper.find('.result-list-item').text()).toContain('2+3')
+  })
 })

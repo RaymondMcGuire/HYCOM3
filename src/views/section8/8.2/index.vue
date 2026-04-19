@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { Chapter7 } from '@/hycom_lib/chapter7'
 import HycomForm from '@/components/HycomForm/index.vue'
 import {
@@ -45,28 +45,30 @@ const formulas = {
   6: 'h_y :管道沿程水头损失,m'
 }
 
-@Component({
+export default defineComponent({
+  name: 'Section82Calculator',
   components: {
     HycomForm
-  }
-})
-export default class Chapter9Section21 extends Vue {
-  public formState = createCalculationState(fields)
-
-  public definition: CalculationDefinition = {
-    title: '8.2 塑料管管（渠）道沿程水头损失',
-    fields,
-    formulas,
-    demoCase,
-    execute: ({ input }) => {
-      const value = Chapter7.slgdyctss(
-        Number(input['\\upsilon']),
-        Number(input.d_j),
-        Number(input.v),
-        Number(input.l)
-      )
-      return '管道沿程水头损失=' + value.toFixed(2).toString()
+  },
+  data() {
+    return {
+      formState: createCalculationState(fields),
+      definition: {
+        title: '8.2 塑料管管（渠）道沿程水头损失',
+        fields,
+        formulas,
+        demoCase,
+        execute: ({ input }) => {
+          const value = Chapter7.slgdyctss(
+            Number(input['\\upsilon']),
+            Number(input.d_j),
+            Number(input.v),
+            Number(input.l)
+          )
+          return `管道沿程水头损失=${value.toFixed(2)}`
+        }
+      } as CalculationDefinition
     }
   }
-}
+})
 </script>

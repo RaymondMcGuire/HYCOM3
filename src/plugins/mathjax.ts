@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import { defineComponent, h, type App } from 'vue'
 
 type PlainObject = Record<string, unknown>
 
@@ -151,7 +151,7 @@ export function renderByMathjax(element?: Element | null) {
   })
 }
 
-export const MathJax = Vue.extend({
+export const MathJax = defineComponent({
   name: 'MathJax',
   props: {
     latex: {
@@ -165,14 +165,14 @@ export const MathJax = Vue.extend({
   },
   watch: {
     latex() {
-      void (this as Vue & { renderMathJax: () => Promise<void> }).renderMathJax()
+      void this.renderMathJax()
     },
     block() {
-      void (this as Vue & { renderMathJax: () => Promise<void> }).renderMathJax()
+      void this.renderMathJax()
     }
   },
   mounted() {
-    void (this as Vue & { renderMathJax: () => Promise<void> }).renderMathJax()
+    void this.renderMathJax()
   },
   methods: {
     async renderMathJax() {
@@ -191,14 +191,14 @@ export const MathJax = Vue.extend({
       }
     }
   },
-  render(h) {
+  render() {
     return h('span')
   }
 })
 
 export default {
   version: '1.0.0',
-  install(vue: typeof Vue) {
-    vue.component('MathJax', MathJax)
+  install(app: App) {
+    app.component('MathJax', MathJax)
   }
 }

@@ -1,42 +1,43 @@
-<!--
- * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2022-03-11 21:19:00
- * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2022-06-04 11:57:57
- * @FilePath: \hycom_app\src\views\chapter1\2.1\2.1.3\index.vue
- * @Description:
- * Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
--->
 <template>
   <div>
     <hycom-form
-      ref="template"
-      :title="title"
-      :data="data"
-      :init-data="initData"
-      :demo-content="demoContent"
-      :demo-result="demoResult"
-      :formulas="formulas"
-      @beforeOnCalculate="beforeOnCalculate"
+      :definition="definition"
+      :state="formState"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { Chapter1 } from '@/hycom_lib/chapter1'
 import { tfyType } from '@/hycom_lib/common'
-
 import HycomForm from '@/components/HycomForm/index.vue'
+import {
+  CalculationDefinition,
+  createCalculationState,
+  DemoCase,
+  FieldSchema,
+  ResultSchema
+} from '@/shared/calculations'
 
-@Component({
-  components: {
-    HycomForm
-  }
-})
-export default class Chapter1Section1Sub3 extends Vue {
-  public title = '1.1.3 驼峰堰泄流能力';
-  public initData = {
+type CrestedWeirResult = {
+  raw: string;
+  m: string;
+  Q: string;
+}
+
+const fields: FieldSchema[] = [
+  { key: '驼峰堰堰型', label: '驼峰堰堰型', type: 'select' },
+  { key: 'P_1', latex: 'P_1', type: 'number' },
+  { key: 'v_0', latex: 'v_0', type: 'number' },
+  { key: 'H', latex: 'H', type: 'number' },
+  { key: '\\varepsilon', latex: '\\varepsilon', type: 'number' },
+  { key: 'n', latex: 'n', type: 'number' },
+  { key: 'b', latex: 'b', type: 'number' }
+]
+
+const demoCase: DemoCase = {
+  values: {
     驼峰堰堰型: tfyType.a,
     P_1: 2.5,
     v_0: 3.5,
@@ -44,46 +45,64 @@ export default class Chapter1Section1Sub3 extends Vue {
     '\\varepsilon': 0.817,
     n: 1,
     b: 25
-  };
-  public data = {
-    驼峰堰堰型: '',
-    P_1: '',
-    v_0: '',
-    H: '',
-    '\\varepsilon': '',
-    n: '',
-    b: ''
-  };
-  public formulas = {
-    0: 'Q :流量,m^3/s',
-    1: 'n :闸孔数目',
-    2: 'b :单孔宽度,m',
-    3: '\\varepsilon :侧收缩系数, 取值低堰可取 \\varepsilon=0.80 \\sim 0.90 ,均值0.85',
-    4: 'P_1 :上游堰高,m',
-    5: 'g :重力加速度,m/s^2,取9.8',
-    6: 'H_0 :计入行进流速的堰上水头,m',
-    7: 'H :堰上水头,m',
-    8: 'm :流量系数'
-  };
-
-  public demoContent =
-    '南方某水利工程,溢洪道为驼峰堰,堰型为a型,堰高P1=2.5m,H=4.525m,v0 =3.5m/s,n=1,b=25m,epsilon=0.817,计算流量。';
-  public demoResult = '求得流量为458.63';
-  public beforeOnCalculate() {
-    let objs = Chapter1.tfy(
-      +this.data.P_1,
-      +this.data.v_0,
-      +this.data.H,
-      +this.data['\\varepsilon'],
-      +this.data.n,
-      +this.data.b,
-      +this.data.驼峰堰堰型
-    )
-    let outStr = '流量系数m:'
-    outStr +=
-      objs.m.toFixed(2).toString() + '|流量Q:' + objs.Q.toFixed(2).toString()
-    let template = this.$refs.template as any
-    template.form.result = outStr
-  }
+  },
+  description: '南方某水利工程,溢洪道为驼峰堰,堰型为a型,堰高P1=2.5m,H=4.525m,v0 =3.5m/s,n=1,b=25m,epsilon=0.817,计算流量。',
+  expectedResult: '求得流量为458.63'
 }
+
+const formulas = {
+  0: 'Q :流量,m^3/s',
+  1: 'n :闸孔数目',
+  2: 'b :单孔宽度,m',
+  3: '\\varepsilon :侧收缩系数, 取值低堰可取 \\varepsilon=0.80 \\sim 0.90 ,均值0.85',
+  4: 'P_1 :上游堰高,m',
+  5: 'g :重力加速度,m/s^2,取9.8',
+  6: 'H_0 :计入行进流速的堰上水头,m',
+  7: 'H :堰上水头,m',
+  8: 'm :流量系数'
+}
+
+const resultSchema: ResultSchema<CrestedWeirResult> = {
+  summary: [
+    { key: 'm', label: 'm', latex: 'm' },
+    { key: 'Q', label: 'Q', latex: 'Q' }
+  ]
+}
+
+export default defineComponent({
+  name: 'Section113Calculator',
+  components: {
+    HycomForm
+  },
+  data() {
+    return {
+      formState: createCalculationState(fields),
+      definition: {
+        title: '1.1.3 驼峰堰泄流能力',
+        fields,
+        formulas,
+        result: resultSchema,
+        demoCase,
+        execute: ({ input }) => {
+          const result = Chapter1.tfy(
+            Number(input.P_1),
+            Number(input.v_0),
+            Number(input.H),
+            Number(input['\\varepsilon']),
+            Number(input.n),
+            Number(input.b),
+            Number(input['驼峰堰堰型'])
+          )
+
+          return {
+            raw: `流量系数m:${result.m.toFixed(2)}|流量Q:${result.Q.toFixed(2)}`,
+            m: result.m.toFixed(2),
+            Q: result.Q.toFixed(2)
+          }
+        },
+        formatResult: (result: CrestedWeirResult) => result.raw
+      } as CalculationDefinition<Record<string, any>, CrestedWeirResult>
+    }
+  }
+})
 </script>

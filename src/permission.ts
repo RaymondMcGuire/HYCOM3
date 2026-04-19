@@ -6,47 +6,57 @@
  * @Description:
  * @FilePath: \hycom_app\src\permission.ts
  */
-import router from './router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { Message } from 'element-ui'
+import type { Router } from 'vue-router'
+
+import { useSessionState } from '@/app/state'
+import { uiFeedback } from '@/shared/ui/uiFeedback'
 import { getToken } from '@/utils/auth'
-import { Route } from 'vue-router'
-import { UserModule } from '@/store/modules/user'
+
+const sessionState = useSessionState()
+const whiteList = ['/login', '/register']
+
+let permissionGuardsRegistered = false
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login', '/register']
-
-router.beforeEach((to: Route, from: Route, next: any) => {
-  NProgress.start()
-  if (getToken()) {
-    if (to.path === '/login') {
-      next({ path: '/' })
-      NProgress.done() // If current page is dashboard will not trigger afterEach hook, so manually handle it
-    } else {
-      if (UserModule.roles.length === 0) {
-        UserModule.GetUserInfo().then(() => {
-          next()
-        }).catch((err) => {
-          UserModule.FedLogOut().then(() => {
-            Message.error(err || 'Verification failed, please login again')
-            next(`/login?redirect=${to.path}`)
-          })
-        })
-      } else {
-        next()
-      }
-    }
-  } else {
-    if (whiteList.indexOf(to.path) !== -1) {
-      next()
-    } else {
-      next(`/login?redirect=${to.path}`) // Redirect to login page
-    }
+export function registerPermissionGuards(router: Router) {
+  if (permissionGuardsRegistered) {
+    return
   }
-})
 
-router.afterEach(() => {
-  NProgress.done()
-})
+  router.beforeEach(async (to) => {
+    NProgress.start()
+
+    if (getToken()) {
+      if (to.path === '/login') {
+        return { path: '/' }
+      }
+
+      if (sessionState.roles.length === 0) {
+        try {
+          await sessionState.fetchProfile()
+        } catch (error) {
+          await sessionState.clearLocalSession()
+          uiFeedback.error(String(error || 'Verification failed, please login again'))
+          return `/login?redirect=${to.path}`
+        }
+      }
+
+      return true
+    }
+
+    if (whiteList.indexOf(to.path) !== -1) {
+      return true
+    }
+
+    return `/login?redirect=${to.path}`
+  })
+
+  router.afterEach(() => {
+    NProgress.done()
+  })
+
+  permissionGuardsRegistered = true
+}

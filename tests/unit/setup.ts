@@ -1,8 +1,9 @@
-import Vue from 'vue'
-import ElementUI from 'element-ui'
+import { config } from '@vue/test-utils'
 
-Vue.use(ElementUI)
-Vue.config.productionTip = false
+config.global.components = {
+  MathJax: { template: '<span />' },
+  'math-jax': { template: '<span />' }
+}
 
 class ResizeObserverMock {
   observe() {}

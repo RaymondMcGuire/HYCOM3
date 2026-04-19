@@ -9,33 +9,29 @@
 -->
 
 <template>
-  <el-row :gutter="20">
-    <el-col :span="11">
-      <img
-        style="width:100%"
-        src="@/assets/images/graph/fig266.png"
-      >
-    </el-col>
-    <el-col :span="9">
-      <Scatter
-        :chart-options="chartOptions"
-        :chart-data="chartData"
-        :chart-id="chartId"
-        :dataset-id-key="datasetIdKey"
-        :plugins="plugins"
-        :css-classes="cssClasses"
-        :styles="styles"
-        :width="width"
-        :height="height"
-      />
-    </el-col>
-  </el-row>
+  <div class="line-chart-layout">
+    <img
+      style="width:100%"
+      src="@/assets/images/graph/fig266.png"
+    >
+    <Scatter
+      :chart-options="chartOptions"
+      :chart-data="chartData"
+      :chart-id="chartId"
+      :dataset-id-key="datasetIdKey"
+      :plugins="plugins"
+      :css-classes="cssClasses"
+      :styles="styles"
+      :width="width"
+      :height="height"
+    />
+  </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 
-import { Scatter } from 'vue-chartjs/legacy'
+import { Scatter } from 'vue-chartjs'
 
 import {
   Chart as ChartJS,
@@ -58,24 +54,43 @@ ChartJS.register(
   LinearScale
 )
 
-@Component({
+export default defineComponent({
   name: 'LineChart',
   components: {
     Scatter
-  }
-})
-
-export default class LineChart extends Vue {
-@Prop({ default: 'line-chart' }) chartId!: string;
-@Prop({ default: 'label' }) datasetIdKey!: string;
-@Prop({ default: 400 }) width!: number;
-@Prop({ default: 400 }) height!: number;
-@Prop({ default: '' }) cssClasses!: string;
-@Prop({ default: () => {} }) styles!: object;
-@Prop({ default: () => [] }) plugins!: Array<string>;
-
-data() {
-  return {
+  },
+  props: {
+    chartId: {
+      type: String,
+      default: 'line-chart'
+    },
+    datasetIdKey: {
+      type: String,
+      default: 'label'
+    },
+    width: {
+      type: Number,
+      default: 400
+    },
+    height: {
+      type: Number,
+      default: 400
+    },
+    cssClasses: {
+      type: String,
+      default: ''
+    },
+    styles: {
+      type: Object,
+      default: () => ({})
+    },
+    plugins: {
+      type: Array,
+      default: () => []
+    }
+  },
+  data() {
+    return {
     chartData: {
       datasets: [
         {
@@ -269,6 +284,21 @@ data() {
       }
     }
   }
-}
-}
+  }
+})
 </script>
+
+<style scoped>
+.line-chart-layout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 11fr) minmax(280px, 9fr);
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .line-chart-layout {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

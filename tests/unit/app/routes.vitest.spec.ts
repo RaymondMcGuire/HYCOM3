@@ -16,7 +16,7 @@ describe('app/router/routes', () => {
       '/section6',
       '/section7',
       '/section8',
-      '*'
+      '/:pathMatch(.*)*'
     ])
   })
 

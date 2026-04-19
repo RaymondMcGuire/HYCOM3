@@ -1,64 +1,95 @@
 <template>
-  <i :class="iconClass" />
+  <component
+    :is="iconComponent"
+    class="menu-icon"
+  />
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import {
+  Aim,
+  Collection,
+  DataAnalysis,
+  DataLine,
+  Document,
+  DocumentCopy,
+  Histogram,
+  Menu,
+  Notebook,
+  Odometer,
+  OfficeBuilding,
+  Operation,
+  Reading,
+  Setting,
+  Tickets,
+  User,
+  View,
+  WindPower
+} from '@element-plus/icons-vue'
+import { computed, defineComponent } from 'vue'
 
-@Component
-export default class MenuIcon extends Vue {
-  @Prop({ required: true }) level!: number
-  @Prop({ required: true }) type!: string
-
-  get iconClass(): string {
-    const prefix = 'el-icon-'
-    const iconMap = {
-      1: {
-        default: 'menu',
-        calculation: 'data-analysis',
-        settings: 'setting',
-        report: 'document',
-        dashboard: 'odometer',
-        user: 'user'
-      },
-      2: {
-        default: 'notebook-2',
-        calculation: 'data-line',
-        settings: 'set-up',
-        report: 'reading',
-        flow: 'wind-power',
-        structure: 'office-building'
-      },
-      3: {
-        default: 'tickets',
-        calculation: 'histogram',
-        settings: 'operation',
-        report: 'document-copy',
-        specific: 'aim',
-        detail: 'view'
-      }
-    }
-
-    const levelKey = this.level as keyof typeof iconMap
-    const typeKey = this.type as keyof (typeof iconMap)[typeof levelKey]
-
-    return `${prefix}${iconMap[levelKey][typeKey] || iconMap[levelKey].default}`
+const iconMap = {
+  1: {
+    default: Menu,
+    calculation: DataAnalysis,
+    settings: Setting,
+    report: Document,
+    dashboard: Odometer,
+    user: User
+  },
+  2: {
+    default: Notebook,
+    calculation: DataLine,
+    settings: Setting,
+    report: Reading,
+    flow: WindPower,
+    structure: OfficeBuilding
+  },
+  3: {
+    default: Tickets,
+    calculation: Histogram,
+    settings: Operation,
+    report: DocumentCopy,
+    specific: Aim,
+    detail: View
   }
-}
+} as const
+
+export default defineComponent({
+  name: 'MenuIcon',
+  props: {
+    level: {
+      type: Number,
+      required: true
+    },
+    type: {
+      type: String,
+      required: true
+    }
+  },
+  setup(props) {
+    const iconComponent = computed(() => {
+      const levelKey = props.level as keyof typeof iconMap
+      const levelIcons = iconMap[levelKey] || iconMap[1]
+      const typeKey = props.type as keyof typeof levelIcons
+
+      return levelIcons[typeKey] || levelIcons.default || Collection
+    })
+
+    return {
+      iconComponent
+    }
+  }
+})
 </script>
 
 <style scoped>
-i {
-  font-size: 24px;
-  margin-right: 10px;
-}
-
-.el-menu-item i,
-.el-submenu__title i {
-  font-size: 20px;
-}
-
-.el-menu--inline .el-menu-item i {
+.menu-icon {
+  width: 18px;
+  height: 18px;
   font-size: 18px;
+  margin-right: 8px;
+  flex: 0 0 18px;
+  vertical-align: middle;
 }
 </style>

@@ -1,15 +1,12 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
+# HYCOM3 Web build configuration
 version: 2
 
 jobs:
   build:
     docker:
-      - image: cimg/node:24.11
+      - image: cimg/node:24.15
 
-    working_directory: ~/vue-typescript-admin-template
+    working_directory: ~/HYCOM3
 
     steps:
       - checkout

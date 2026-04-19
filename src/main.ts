@@ -7,48 +7,32 @@
  * @Description:
  * Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
-import Vue from 'vue'
-
 import 'normalize.css'
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-import SvgIcon from 'vue-svgicon'
 import '@/styles/index.scss'
-import '@/icons/components'
-import '@/permission'
 
 import App from '@/App.vue'
+import { createRootApp } from '@/app/bootstrap/app'
+import { registerAppGuards } from '@/app/bootstrap/guards'
+import { initializeAppIntegrations } from '@/app/bootstrap/integrations'
+import { initializeAppMathJax } from '@/app/bootstrap/mathjax'
+import { configureVueApp, registerAppPlugins } from '@/app/bootstrap/plugins'
 import store from '@/store'
-import router from '@/router'
+import { createAppRouter } from '@/router'
 
-import MathJax, { initMathJax, renderByMathjax } from '@/plugins/mathjax'
-import { initializeLeanCloud } from '@/integrations/leancloud/client'
+initializeAppIntegrations()
 
-initializeLeanCloud()
+const router = createAppRouter()
 
-function onMathJaxReady() {
-  const el = document.getElementById('app')
-  renderByMathjax(el)
-}
+registerAppGuards(router)
+initializeAppMathJax()
 
-const options = {
-  enableMenu: false
-}
-
-initMathJax({ options }, onMathJaxReady)
-
-Vue.use(MathJax)
-Vue.use(ElementUI)
-Vue.use(SvgIcon, {
-  tagName: 'svg-icon',
-  defaultWidth: '1em',
-  defaultHeight: '1em'
-})
-
-Vue.config.productionTip = false
-
-new Vue({
+const app = createRootApp({
   router,
   store,
-  render: (h) => h(App)
-}).$mount('#app')
+  App
+})
+
+registerAppPlugins(app)
+configureVueApp(app)
+
+app.mount('#app')

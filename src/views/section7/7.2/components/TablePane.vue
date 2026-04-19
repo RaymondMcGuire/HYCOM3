@@ -101,19 +101,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 
-@Component({
-  name: 'TablePane'
-})
-export default class TablePane extends Vue {
-  @Prop({ default: 't1' }) public type!: string;
-
+export default defineComponent({
+  name: 'TablePane',
+  props: {
+    type: {
+      type: String,
+      default: 't1'
+    }
+  },
   data() {
     return {
-      table822: [
-      ]
+      table822: []
     }
   }
-}
+})
 </script>

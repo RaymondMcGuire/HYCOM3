@@ -15,8 +15,8 @@
       @beforeOnDemo="beforeOnDemo"
       @beforeOnReset="beforeOnReset"
     >
-      <div slot="table_fir_anchor">
-        <el-row :gutter="20">
+      <template #table_fir_anchor>
+        <div class="section-slot-stack">
           <el-tabs
             v-model="activeTableName"
             style="margin-top: 15px"
@@ -36,36 +36,51 @@
               </keep-alive>
             </el-tab-pane>
           </el-tabs>
-          <br>
-        </el-row>
 
-        <el-row :gutter="20">
-          <h3>请点击⊕添加断面信息</h3>
-          <dynamic-slkhs-params
-            ref="slkhs"
-            :explain-text="explainText"
-            @updateParamsData="updateParamsData"
-          />
-        </el-row>
-      </div>
+          <div class="section-slot-stack">
+            <h3 class="section-slot-note">请点击⊕添加断面信息</h3>
+            <dynamic-slkhs-params
+              ref="slkhs"
+              :explain-text="explainText"
+            />
+          </div>
+        </div>
+      </template>
     </hycom-form>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { Chapter4 } from '@/hycom_lib/chapter4'
 import { Table2DLerp } from '@/hycom_lib/common'
 
-import TablePane from './components/TablePane.vue'
+import CavitationTemperatureTable from '@/shared/components/cavitation/CavitationTemperatureTable.vue'
 import HycomForm from '@/components/HycomForm/index.vue'
-import DynamicSlkhsParams from './components/DynamicSLKHSParams.vue'
+import DynamicSlkhsParams from '@/shared/components/cavitation/DynamicSlkhsParams.vue'
 import {
+  applyDynamicParamGroupDemo,
   CalculationDefinition,
   createCalculationState,
   DemoCase,
-  FieldSchema
+  DynamicParamGroupSchema,
+  FieldSchema,
+  resetDynamicRefs,
+  ResultSchema,
+  serializeDynamicParamGroup
 } from '@/shared/calculations'
+
+type CavitationSectionResult = {
+  index: number;
+  sigma?: string;
+  conclusion: string;
+  text: string;
+}
+
+type CavitationResult = {
+  raw: string;
+  sections: CavitationSectionResult[];
+}
 
 const fields: FieldSchema[] = [
   { key: '\\nabla', latex: '\\nabla', type: 'number' },
@@ -91,89 +106,133 @@ const formulas = {
   6: 'C :水温'
 }
 
-@Component({
-  components: {
-    HycomForm,
-    TablePane,
-    DynamicSlkhsParams
-  }
-})
-export default class Chapter4Section42 extends Vue {
-  public explainText = '断面';
-  public formState = createCalculationState(fields)
-  public definition: CalculationDefinition = {
-    title: '3.4 高流速水工隧洞沿程水流空化数',
-    fields,
-    formulas,
-    demoCase,
-    execute: () => {
-      const tableLerp = new Table2DLerp()
-      const hv = tableLerp.arr(
-        this.table251Vertical,
-        this.table251Horizon,
-        this.table251Data,
-        0,
-        Number(this.formState.C)
-      )
-
-      const slkhs = this.$refs.slkhs as any
-      const params = slkhs.params || []
-
-      const hiList: number[] = []
-      const viList: number[] = []
-      params.forEach(function(elem: any) {
-        hiList.push(elem.hi)
-        viList.push(elem.vi)
-      })
-
-      let outStr = ''
-      let counter = 1
-      const res = Chapter4.glssg_slkqhs(
-        Number(this.formState['\\nabla']),
-        hv,
-        hiList,
-        viList
-      )
-      res.forEach(function(elem: any) {
-        outStr += '第' + counter.toString() + '断面:' + elem + ';'
-        counter += 1
-      })
-
-      return outStr
+const resultSchema: ResultSchema<CavitationResult> = {
+  lists: [
+    {
+      key: 'sections',
+      label: '断面结果',
+      itemLabel: (item) => `第${(item as CavitationSectionResult).index}断面`,
+      itemValue: (item) => (item as CavitationSectionResult).text
     }
-  }
+  ]
+}
 
-  // -------table 251 data--------------------------
-  public table251Data = [
-    [0.06, 0.09, 0.13, 0.17, 0.24, 0.32, 0.43, 0.75]
-  ];
-  public table251Vertical = [0];
-  public table251Horizon = [0, 5, 10, 15, 20, 25, 30, 40];
+function buildCavitationResult(items: string[]): CavitationResult {
+  const sections = items.map((item, index) => {
+    const [sigmaPart, conclusion = ''] = item.split(',')
+    const sigma = sigmaPart.includes('=')
+      ? sigmaPart.split('=')[1].trim()
+      : undefined
 
-  public tableOptions = [
-    { label: '表:水的汽化压力水头hv与水温的关系', key: 't1' }
-  ];
-  public activeTableName = 't1';
-  // -------table 251 data--------------------------
-  private paramData1 = [];
+    return {
+      index: index + 1,
+      sigma,
+      conclusion: conclusion.trim(),
+      text: item
+    }
+  })
 
-  public updateParamsData(paramData) {
-    this.paramData1 = paramData
-  }
-
-  public beforeOnReset() {
-    let slkhs = this.$refs.slkhs as any
-    slkhs.removeAllField()
-  }
-
-  public beforeOnDemo() {
-    let slkhs = this.$refs.slkhs as any
-    slkhs.removeAllField()
-
-    slkhs.addFieldWithData(13.80776, 20.912)
-    slkhs.addFieldWithData(9.518, 24.27)
-    slkhs.addFieldWithData(10.003, 23.093)
-    slkhs.addFieldWithData(10.923, 21.148)
+  return {
+    raw: sections.map((section) => `第${section.index}断面:${section.text}`).join(';') + (sections.length > 0 ? ';' : ''),
+    sections
   }
 }
+
+type SlkhsItem = {
+  hi: string | number;
+  vi: string | number;
+}
+
+type SlkhsSerialized = {
+  hiList: number[];
+  viList: number[];
+}
+
+const slkhsGroupSchema: DynamicParamGroupSchema<SlkhsItem, SlkhsSerialized> = {
+  refName: 'slkhs',
+  createDefaultItem: () => ({ hi: '', vi: '' }),
+  toArgs: (item) => [item.hi, item.vi],
+  demoItems: [
+    { hi: 13.80776, vi: 20.912 },
+    { hi: 9.518, vi: 24.27 },
+    { hi: 10.003, vi: 23.093 },
+    { hi: 10.923, vi: 21.148 }
+  ],
+  serialize: (items) => ({
+    hiList: items.map((item) => Number(item.hi)),
+    viList: items.map((item) => Number(item.vi))
+  })
+}
+
+function getSlkhsItems(refs: Record<string, any>): SlkhsItem[] {
+  return (refs.slkhs?.params || []) as SlkhsItem[]
+}
+
+export default defineComponent({
+  name: 'Section34Calculator',
+  components: {
+    HycomForm,
+    TablePane: CavitationTemperatureTable,
+    DynamicSlkhsParams
+  },
+  data() {
+    return {
+      explainText: '断面',
+      formState: createCalculationState(fields),
+      table251Data: [
+        [0.06, 0.09, 0.13, 0.17, 0.24, 0.32, 0.43, 0.75]
+      ],
+      table251Vertical: [0],
+      table251Horizon: [0, 5, 10, 15, 20, 25, 30, 40],
+      tableOptions: [
+        { label: '表:水的汽化压力水头hv与水温的关系', key: 't1' }
+      ],
+      activeTableName: 't1',
+      definition: {
+        title: '3.4 高流速水工隧洞沿程水流空化数',
+        fields,
+        formulas,
+        result: resultSchema,
+        demoCase,
+        execute: () => {
+          const tableLerp = new Table2DLerp()
+          const hv = tableLerp.arr(
+            this.table251Vertical,
+            this.table251Horizon,
+            this.table251Data,
+            0,
+            Number(this.formState.C)
+          )
+
+          const { hiList, viList } = serializeDynamicParamGroup(
+            slkhsGroupSchema,
+            getSlkhsItems(this.getDynamicRefs())
+          )
+
+          const res = Chapter4.glssg_slkqhs(
+            Number(this.formState['\\nabla']),
+            hv,
+            hiList,
+            viList
+          )
+          return buildCavitationResult(res)
+        },
+        formatResult: (result: CavitationResult) => result.raw
+      } as CalculationDefinition<Record<string, any>, CavitationResult>
+    }
+  },
+  methods: {
+    getDynamicRefs() {
+      return this.$refs as Record<string, any>
+    },
+    beforeOnReset() {
+      this.activeTableName = 't1'
+      resetDynamicRefs(this.getDynamicRefs(), [slkhsGroupSchema.refName])
+    },
+    beforeOnDemo() {
+      this.activeTableName = 't1'
+      applyDynamicParamGroupDemo(this.getDynamicRefs(), slkhsGroupSchema)
+    }
+  }
+})
 </script>

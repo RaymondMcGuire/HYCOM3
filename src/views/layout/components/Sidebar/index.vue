@@ -1,6 +1,10 @@
 <template>
-  <el-scrollbar wrap-class="scrollbar-wrapper">
+  <el-scrollbar
+    class="layout-sidebar"
+    wrap-class="scrollbar-wrapper"
+  >
     <el-menu
+      class="sidebar-menu"
       :show-timeout="200"
       :default-active="$route.path"
       :collapse="isCollapse"
@@ -21,60 +25,87 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import { AppModule } from '@/store/modules/app'
+import { defineComponent } from 'vue'
+import { routes } from '@/app/router/routes'
 import SidebarItem from './SidebarItem.vue'
+import { useLayoutState } from '@/app/state'
 
-@Component({
+const layoutState = useLayoutState()
+
+export default defineComponent({
+  name: 'LayoutSidebar',
   components: {
     SidebarItem
+  },
+  props: {
+    collapse: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    sidebar() {
+      return layoutState.sidebar
+    },
+    routes() {
+      return routes
+    },
+    isCollapse(): boolean {
+      return !this.sidebar.opened
+    }
   }
 })
-export default class SideBar extends Vue {
-  @Prop({ default: false }) private collapse!: boolean;
-
-  get sidebar() {
-    return AppModule.sidebar
-  }
-
-  get routes() {
-    return (this.$router as any).options.routes
-  }
-
-  get isCollapse() {
-    return !this.sidebar.opened
-  }
-}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .horizontal-collapse-transition {
   transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
 }
 
-.scrollbar-wrapper {
-  overflow-x: hidden !important;
+.layout-sidebar {
+  height: 100%;
 
-  .el-scrollbar__view {
+  :deep(.scrollbar-wrapper) {
+    overflow-x: hidden !important;
+  }
+
+  :deep(.el-scrollbar__view) {
     height: 100%;
   }
-}
 
-.el-scrollbar__bar {
-  &.is-vertical {
-    right: 0px;
+  :deep(.el-scrollbar__bar.is-vertical) {
+    right: 0;
   }
 
-  &.is-horizontal {
+  :deep(.el-scrollbar__bar.is-horizontal) {
     display: none;
   }
 }
-</style>
 
-<style lang="scss" scoped>
-.el-menu {
+.sidebar-menu {
   border: none;
   height: 100%;
   width: 100% !important;
+
+  :deep(.el-menu-item),
+  :deep(.el-sub-menu__title) {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  :deep(.el-menu-item > span),
+  :deep(.el-sub-menu__title > span) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :deep(.svg-icon) {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+  }
 }
 </style>

@@ -9,13 +9,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import MenuCard from '@/components/MenuCard/index.vue'
 
-@Component({
+export default defineComponent({
+  name: 'Section73Layout',
   components: {
     MenuCard
   }
 })
-export default class DischargeCapacityCalculation extends Vue {}
 </script>

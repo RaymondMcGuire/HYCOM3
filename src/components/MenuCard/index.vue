@@ -1,7 +1,7 @@
 <template>
-  <el-card
+  <panel-shell
     class="menu-card"
-    shadow="hover"
+    padding="compact"
   >
     <template #header>
       <div class="card-header">
@@ -14,36 +14,43 @@
         </h2>
       </div>
     </template>
-    <transition
-      name="fade-transform"
-      mode="out-in"
-    >
+    <div class="menu-card__content">
       <slot />
-    </transition>
-  </el-card>
+    </div>
+  </panel-shell>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
+import PanelShell from '@/shared/components/layout/PanelShell.vue'
 import MenuIcon from './components/MenuIcon.vue'
 
-@Component({
+export default defineComponent({
+  name: 'MenuCard',
   components: {
+    PanelShell,
     MenuIcon
+  },
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    level: {
+      type: Number,
+      default: 2
+    },
+    iconType: {
+      type: String,
+      default: 'default'
+    }
   }
 })
-export default class MenuCard extends Vue {
-  @Prop({ required: true }) title!: string
-  @Prop({ default: 2 }) level!: number
-  @Prop({ default: 'default' }) iconType!: string
-}
 </script>
 
 <style lang="scss" scoped>
 .menu-card {
   margin-bottom: 20px;
-  border-radius: 8px;
-  overflow: hidden;
   transition: all 0.3s ease;
 
   &:hover {
@@ -59,29 +66,14 @@ export default class MenuCard extends Vue {
     .title {
       margin: 0;
       font-size: 18px;
-      color: #1890ff;
+      color: var(--color-primary);
       display: flex;
       align-items: center;
     }
   }
-
-  ::v-deep .el-card__body {
-    padding: 20px;
-  }
 }
 
-.fade-transform-enter-active,
-.fade-transform-leave-active {
-  transition: all 0.5s;
-}
-
-.fade-transform-enter {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.fade-transform-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
+.menu-card__content {
+  min-width: 0;
 }
 </style>

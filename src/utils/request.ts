@@ -1,21 +1,22 @@
 import axios from 'axios'
-import { Message, MessageBox } from 'element-ui'
 import { getToken } from '@/utils/auth'
-import { UserModule } from '@/store/modules/user'
+import { useSessionState } from '@/app/state'
+import { uiFeedback } from '@/shared/ui/uiFeedback'
 
 const service = axios.create()
+const sessionState = useSessionState()
 
 // Request interceptors
 service.interceptors.request.use(
   (config) => {
     // Add X-Token header to every request, you can add other custom headers here
-    if (UserModule.token) {
+    if (sessionState.token) {
       config.headers['X-Token'] = getToken()
     }
     return config
   },
   (error) => {
-    Promise.reject(error)
+    return Promise.reject(error)
   }
 )
 
@@ -30,15 +31,12 @@ service.interceptors.response.use(
     // code == 60204: account or password is incorrect
     // You can change this part for your own usage.
     const res = response.data
-    // console.log(res)
     if (res.code !== 20000) {
-      Message({
-        message: res.message,
-        type: 'error',
+      uiFeedback.error(res.message, {
         duration: 5 * 1000
       })
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        MessageBox.confirm(
+        uiFeedback.confirm(
           '你已被登出,可以取消继续留在该页面,或者重新登录',
           '确定登出',
           {
@@ -47,7 +45,7 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          UserModule.FedLogOut().then(() => {
+          sessionState.clearLocalSession().then(() => {
             location.reload() // To prevent bugs from vue-router
           })
         })
@@ -58,9 +56,7 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    Message({
-      message: error.message,
-      type: 'error',
+    uiFeedback.error(error.message, {
       duration: 5 * 1000
     })
     return Promise.reject(error)

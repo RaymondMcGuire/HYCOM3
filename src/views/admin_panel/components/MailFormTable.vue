@@ -1,18 +1,15 @@
 <template>
-  <el-container>
-    <el-header>
-      <h2>{{ title }}</h2>
-    </el-header>
-    <el-main>
+  <panel-shell :title="title">
+    <div class="admin-table">
       <el-table
         :data="mailList"
-        style="width: 100%;padding-top: 15px;"
+        style="width: 100%;"
       >
         <el-table-column
           label="姓名"
           align="center"
         >
-          <template slot-scope="scope">
+          <template #default="scope">
             {{ scope.row.name }}
           </template>
         </el-table-column>
@@ -21,7 +18,7 @@
           label="邮箱地址"
           align="center"
         >
-          <template slot-scope="scope">
+          <template #default="scope">
             {{ scope.row.email }}
           </template>
         </el-table-column>
@@ -30,7 +27,7 @@
           label="标题"
           align="center"
         >
-          <template slot-scope="scope">
+          <template #default="scope">
             {{ scope.row.title }}
           </template>
         </el-table-column>
@@ -39,50 +36,48 @@
           label="内容"
           align="center"
         >
-          <template slot-scope="scope">
+          <template #default="scope">
             {{ scope.row.message }}
           </template>
         </el-table-column>
       </el-table>
-    </el-main>
-  </el-container>
+    </div>
+  </panel-shell>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { adminService, FeedbackRecord } from '@/services/adminService'
+import PanelShell from '@/shared/components/layout/PanelShell.vue'
 
-@Component({
-  filters: {
-    statusFilter: (status: string) => {
-      const statusMap: { [key: string]: string } = {
-        success: 'success',
-        pending: 'danger'
+export default defineComponent({
+  name: 'MailFormTable',
+  components: {
+    PanelShell
+  },
+  data() {
+    return {
+      mailList: [] as FeedbackRecord[],
+      title: '意见反馈列表'
+    }
+  },
+  created() {
+    void this.fetchData()
+  },
+  methods: {
+    async fetchData() {
+      try {
+        this.mailList = await adminService.fetchFeedbackForms()
+      } catch (error) {
+        console.log(error)
       }
-      return statusMap[status]
-    },
-    orderNoFilter: (str: string) => str.substring(0, 30),
-    // Input 10000 => Output "10,000"
-    toThousandFilter: (num: number) => {
-      return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
     }
   }
 })
-export default class MailFormTable extends Vue {
-  private mailList: FeedbackRecord[] = []
-  private title : string = '意见反馈列表'
-  created() {
-    this.fetchData()
-  }
-
-  private fetchData() {
-    adminService.fetchFeedbackForms()
-      .then((records) => {
-        this.mailList = records
-      })
-      .catch((error: Error) => {
-        console.log(error)
-      })
-  }
-}
 </script>
+
+<style scoped>
+.admin-table {
+  padding-top: 15px;
+}
+</style>

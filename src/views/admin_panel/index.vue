@@ -1,43 +1,32 @@
 <template>
   <div class="app-container">
-    <el-row :gutter="8">
-      <el-col
-        :xs="{span: 24}"
-        :sm="{span: 24}"
-        :md="{span: 24}"
-        :lg="{span: 12}"
-        :xl="{span: 12}"
-        style="padding-right:8px;margin-bottom:30px;"
-      >
+    <app-grid
+      columns="repeat(auto-fit, minmax(320px, 1fr))"
+      gap="24px"
+    >
+      <div>
         <mail-form-table />
-      </el-col>
+      </div>
 
-      <el-col
-        :xs="{span: 24}"
-        :sm="{span: 24}"
-        :md="{span: 24}"
-        :lg="{span: 12}"
-        :xl="{span: 12}"
-        style="padding-right:8px;margin-bottom:30px;"
-      >
+      <div>
         <usr-table />
-      </el-col>
-    </el-row>
+      </div>
+    </app-grid>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
+import AppGrid from '@/shared/components/layout/AppGrid.vue'
 import MailFormTable from './components/MailFormTable.vue'
 import UsrTable from './components/UsrTable.vue'
 
-@Component({
+export default defineComponent({
+  name: 'DashboardAdminPanel',
   components: {
+    AppGrid,
     MailFormTable,
     UsrTable
   }
 })
-export default class DashboardAdminPanel extends Vue {
-
-}
 </script>

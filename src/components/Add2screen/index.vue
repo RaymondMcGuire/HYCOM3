@@ -21,34 +21,40 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
-export default class Add2screen extends Vue {
-  private name: String ='Add2screen';
-  public deferredPrompt: any;
+import { defineComponent } from 'vue'
 
+type BeforeInstallPromptEventLike = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+export default defineComponent({
+  name: 'Add2screen',
+  data() {
+    return {
+      deferredPrompt: null as BeforeInstallPromptEventLike | null
+    }
+  },
   mounted() {
     this.captureEvent()
-  }
-
-  public captureEvent() {
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // ! Prevent Chrome 67 and earlier from automatically showing the prompt
-      e.preventDefault()
-      // Stash the event so it can be triggered later.
-      this.deferredPrompt = e
-    })
-  }
-
-  public clickCallback() {
-    // Show the prompt
-    this.deferredPrompt.prompt()
-    // Wait for the user to respond to the prompt
-    this.deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        // Call another function?
+  },
+  methods: {
+    captureEvent() {
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault()
+        this.deferredPrompt = event as BeforeInstallPromptEventLike
+      })
+    },
+    clickCallback() {
+      if (!this.deferredPrompt) {
+        return
       }
-      this.deferredPrompt = null
-    })
+
+      void this.deferredPrompt.prompt()
+      void this.deferredPrompt.userChoice.then(() => {
+        this.deferredPrompt = null
+      })
+    }
   }
-}
+})
 </script>

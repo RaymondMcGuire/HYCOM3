@@ -1,10 +1,10 @@
 ## HYCOM3
 
-这是一个以 `src/hycom_lib` 为核心计算层的水力学计算应用。本轮已将 Web 构建入口切换到 Vite，用于替代原来的 Vue CLI 3 运行链。
+这是一个以 `src/hycom_lib` 为核心计算层的水力学计算 Web 应用，当前主线基于 `Vue 3 + Vite` 运行。
 
 ### 推荐环境
 
-- Node.js：推荐 `24 LTS`，最低 `20.x`
+- Node.js：`>=22.12.0 <25`
 - npm：`10.x`
 
 ### 安装依赖
@@ -77,9 +77,9 @@ npx playwright install chromium
 
 ### 迁移说明
 
-- 本轮目标是先恢复现代化 Web 运行链。
-- 旧的 Vue CLI / Jest / Cypress / Electron 依赖已经从主安装路径中移除，避免它们在新环境下阻塞 `npm install`。
-- `src/background.ts` 和旧 Electron 相关文件仍保留在仓库中，后续会单独迁移。
+- 当前仓库只保留 Web 主线代码。
+- 旧的 Electron / Vue CLI / PWA / Jest / Cypress 残留已从主运行链移除。
+- 当前测试链为 `Vitest + Playwright`。
 
 ### 项目地址
 

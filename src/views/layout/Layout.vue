@@ -20,33 +20,46 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 import { Navbar, AppMain, Sidebar } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
-import { Component } from 'vue-property-decorator'
-import { mixins } from 'vue-class-component'
-import { DeviceType, AppModule } from '@/store/modules/app'
+import { DeviceType, SidebarState } from '@/store/modules/app'
+import { useLayoutState } from '@/app/state'
 
-@Component({
+const layoutState = useLayoutState()
+
+export default defineComponent({
+  name: 'LayoutShell',
   components: {
     Navbar,
     Sidebar,
     AppMain
-  }
-})
-export default class Layout extends mixins(ResizeMixin) {
-  get classObj() {
-    return {
-      hideSidebar: !this.sidebar.opened,
-      openSidebar: this.sidebar.opened,
-      withoutAnimation: this.sidebar.withoutAnimation,
-      mobile: this.device === DeviceType.Mobile
+  },
+  mixins: [ResizeMixin],
+  computed: {
+    classObj(): {
+      hideSidebar: boolean;
+      openSidebar: boolean;
+      withoutAnimation: boolean;
+      mobile: boolean;
+    } {
+      const sidebar = (this as typeof this & { sidebar: SidebarState }).sidebar
+      const device = (this as typeof this & { device: DeviceType }).device
+
+      return {
+        hideSidebar: !sidebar.opened,
+        openSidebar: sidebar.opened,
+        withoutAnimation: sidebar.withoutAnimation,
+        mobile: device === DeviceType.Mobile
+      }
+    }
+  },
+  methods: {
+    handleClickOutside() {
+      void layoutState.closeSideBar(false)
     }
   }
-
-  private handleClickOutside() {
-    AppModule.CloseSideBar(false)
-  }
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -58,6 +71,7 @@ export default class Layout extends mixins(ResizeMixin) {
     position: relative;
     height: 100%;
     width: 100%;
+    overflow-x: hidden;
   }
 
   .drawer-bg {
@@ -74,6 +88,7 @@ export default class Layout extends mixins(ResizeMixin) {
     min-height: 100%;
     transition: margin-left .28s;
     margin-left: $sideBarWidth;
+    width: calc(100% - #{$sideBarWidth});
     position: relative;
   }
 
@@ -82,7 +97,6 @@ export default class Layout extends mixins(ResizeMixin) {
     width: $sideBarWidth !important;
     height: 100%;
     position: fixed;
-    font-size: 0px;
     top: 0;
     bottom: 0;
     left: 0;
@@ -92,11 +106,12 @@ export default class Layout extends mixins(ResizeMixin) {
 
   .hideSidebar {
     .main-container {
-      margin-left: 36px;
+      margin-left: $hideSidebarWidth;
+      width: calc(100% - #{$hideSidebarWidth});
     }
 
     .sidebar-container {
-      width: 36px !important;
+      width: $hideSidebarWidth !important;
     }
   }
 
@@ -104,6 +119,7 @@ export default class Layout extends mixins(ResizeMixin) {
   .mobile {
     .main-container {
       margin-left: 0px;
+      width: 100%;
     }
 
     .sidebar-container {
@@ -114,12 +130,13 @@ export default class Layout extends mixins(ResizeMixin) {
     &.openSidebar {
       position: fixed;
       top: 0;
+      width: 100%;
     }
 
     &.hideSidebar {
       .sidebar-container {
         transition-duration: 0.3s;
-        transform: translate3d(-$sideBarWidth, 0, 0);
+        transform: translate3d(calc(-1 * #{$sideBarWidth}), 0, 0);
       }
     }
   }

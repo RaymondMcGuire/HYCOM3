@@ -31,9 +31,10 @@
 
     <div
       v-for="(input, index) in params"
+      class="dynamic-field-grid"
       :key="`select-${index}`"
     >
-      <el-col :span="2">
+      <div class="dynamic-field-grid__labels">
         <el-form-item>
           <math-jax :latex="'S_{栅条形状'+(index+1)+'}'" />
         </el-form-item>
@@ -63,9 +64,9 @@
             <math-jax :latex="'d_'+(index+1)+''" />
           </el-form-item>
         </div>
-      </el-col>
+      </div>
 
-      <el-col :span="10">
+      <div class="dynamic-field-grid__inputs">
         <el-form-item>
           <el-select
             v-model="input.beta"
@@ -176,112 +177,25 @@
             d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-9.414l2.828-2.829 1.415 1.415L13.414 12l2.829 2.828-1.415 1.415L12 13.414l-2.828 2.829-1.415-1.415L10.586 12 7.757 9.172l1.415-1.415L12 10.586z"
           />
         </svg>
-      </el-col>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import graph412_1 from '@/assets/images/graph/412-1.png'
-import graph412_2 from '@/assets/images/graph/412-2.png'
-import graph412_3 from '@/assets/images/graph/412-3.png'
-import graph412_4 from '@/assets/images/graph/412-4.png'
-import graph412_5 from '@/assets/images/graph/412-5.png'
-import graph412_6 from '@/assets/images/graph/412-6.png'
-import graph412_7 from '@/assets/images/graph/412-7.png'
+import {
+  createDynamicParamsComponent,
+  crossSectionShapeOptions,
+  trashRackShapeOptions
+} from '@/shared/components/pressurizedHydraulics/factory'
 
-import { crossSectionShapeType } from '@/hycom_lib/common'
-
-@Component({
+export default createDynamicParamsComponent({
   name: 'DynamicJklwsSelectParams',
-  components: {
-
+  createEmptyItem: () => ({ beta: '', s: '', b: '', alpha: '', B: '', H: '', d: '', shape: '' }),
+  addFieldKeys: ['beta', 's', 'b', 'alpha', 'B', 'H', 'd', 'shape'],
+  extraData: {
+    shapeOptions: crossSectionShapeOptions,
+    stShapeOptions: trashRackShapeOptions
   }
 })
-
-export default class DynamicJKLWSSelectParams extends Vue {
-    @Prop({ default: '' }) explainText!: string;
-  @Prop({ default: true }) dynamicBtn!: boolean;
-
-  public params:any= [];
-
-  public addField() {
-    this.params.push({ beta: '', s: '', b: '', alpha: '', B: '', H: '', d: '', shape: '' })
-  }
-
-  public shapeOptions = [
-    {
-      id: 0,
-      label: '矩形断面',
-      value: crossSectionShapeType.RECTANGLE
-    },
-    {
-      id: 1,
-      label: '圆形断面',
-      value: crossSectionShapeType.CIRCLE
-    }
-  ];
-
-  public stShapeOptions = [
-    {
-      id: 1,
-      label: '栅条形状1',
-      value: 2.42,
-      img: graph412_1
-    },
-    {
-      id: 2,
-      label: '栅条形状2',
-      value: 1.83,
-      img: graph412_2
-    },
-    {
-      id: 3,
-      label: '栅条形状3',
-      value: 1.67,
-      img: graph412_3
-    },
-    {
-      id: 4,
-      label: '栅条形状4',
-      value: 1.035,
-      img: graph412_4
-    },
-    {
-      id: 5,
-      label: '栅条形状5',
-      value: 0.92,
-      img: graph412_5
-    },
-    {
-      id: 6,
-      label: '栅条形状6',
-      value: 0.76,
-      img: graph412_6
-    },
-    {
-      id: 7,
-      label: '栅条形状7',
-      value: 1.79,
-      img: graph412_7
-    }
-
-  ];
-
-  public removeField(index) {
-    this.params.splice(index, 1)
-  }
-
-  public removeAllField() {
-    let n = this.params.length
-    for (let index = 0; index < n; index++) {
-      this.params.splice(0, 1)
-    }
-  }
-
-  public onParamsDataChange() {
-    this.$emit('updateParamsData', this.params)
-  }
-}
 </script>

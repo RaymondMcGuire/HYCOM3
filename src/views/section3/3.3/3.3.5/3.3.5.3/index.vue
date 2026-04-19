@@ -15,32 +15,44 @@
       @beforeOnDemo="beforeOnDemo"
       @beforeOnReset="beforeOnReset"
     >
-      <div slot="table_fir_anchor">
-        <el-row :gutter="20">
-          <h3>请点击⊕添加断面信息</h3>
-          <dynamic-yhdgf-params
-            ref="yhdgf"
+      <template #table_fir_anchor>
+        <div class="section-slot-stack">
+          <h3 class="section-slot-note">请点击⊕添加断面信息</h3>
+          <dynamic-section-fields
+            ref="params"
+            :fields="sectionFields"
             :explain-text="explainText"
-            @updateParamsData="updateParamsData"
+            @updateParamsData="updateDynamicItems"
           />
-        </el-row>
-      </div>
+        </div>
+      </template>
     </hycom-form>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { Chapter4 } from '@/hycom_lib/chapter4'
 
 import HycomForm from '@/components/HycomForm/index.vue'
-import DynamicYhdgfParams from './components/DynamicYHDGFParams.vue'
+import DynamicSectionFields from '@/shared/components/calculation/DynamicSectionFields.vue'
 import {
+  applyDynamicParamGroupDemo,
+  buildIndexedSectionResult,
   CalculationDefinition,
   createCalculationState,
+  createIndexedSectionResultSchema,
   DemoCase,
-  FieldSchema
+  FieldSchema,
+  IndexedSectionResult,
+  resetDynamicRefs,
+  serializeDynamicParamGroup
 } from '@/shared/calculations'
+import {
+  twoFieldAerationGroupSchema,
+  twoFieldSectionFields,
+  TwoFieldAerationItem
+} from '../shared'
 
 const fields: FieldSchema[] = [
   { key: '\\zeta', latex: '\\zeta', type: 'number' }
@@ -64,62 +76,52 @@ const formulas = {
   6: '\\zeta:修正系数,取1.0~1.4s/m,当流速大于20m/s 时,宜取较大值'
 }
 
-@Component({
+export default defineComponent({
+  name: 'Section3353Calculator',
   components: {
     HycomForm,
-    DynamicYhdgfParams
+    DynamicSectionFields
+  },
+  data() {
+    const formState = createCalculationState(fields)
+    const definition: CalculationDefinition<Record<string, any>, IndexedSectionResult> = {
+      title: '3.3.5.3 溢洪道规范方法计算隧洞掺气水深',
+      fields,
+      formulas,
+      result: createIndexedSectionResultSchema(),
+      demoCase,
+      execute: ({ input }) => {
+        const { hiList, viList } = serializeDynamicParamGroup(
+          twoFieldAerationGroupSchema,
+          this.dynamicItems
+        )
+
+        return buildIndexedSectionResult(
+          Chapter4.yhdgf_sdsqss(Number(input['\\zeta']), hiList, viList)
+        )
+      },
+      formatResult: (result) => result.raw
+    }
+
+    return {
+      explainText: '断面',
+      sectionFields: twoFieldSectionFields,
+      formState,
+      definition,
+      dynamicItems: [] as TwoFieldAerationItem[]
+    }
+  },
+  methods: {
+    beforeOnReset() {
+      this.dynamicItems = []
+      resetDynamicRefs(this.$refs as Record<string, any>, [twoFieldAerationGroupSchema.refName])
+    },
+    beforeOnDemo() {
+      applyDynamicParamGroupDemo(this.$refs as Record<string, any>, twoFieldAerationGroupSchema)
+    },
+    updateDynamicItems(items: TwoFieldAerationItem[]) {
+      this.dynamicItems = items
+    }
   }
 })
-export default class Chapter4Section343 extends Vue {
-  public explainText = '断面';
-  public formState = createCalculationState(fields)
-  public definition: CalculationDefinition = {
-    title: '3.3.5.3 溢洪道规范方法计算隧洞掺气水深',
-    fields,
-    formulas,
-    demoCase,
-    execute: () => {
-      const yhdgf = this.$refs.yhdgf as any
-      const params = yhdgf.params || []
-
-      const hiList: number[] = []
-      const viList: number[] = []
-      params.forEach(function(elem: any) {
-        hiList.push(elem.hi)
-        viList.push(elem.vi)
-      })
-
-      let outStr = ''
-      let counter = 1
-      const res = Chapter4.yhdgf_sdsqss(Number(this.formState['\\zeta']), hiList, viList)
-      res.forEach(function(elem: any) {
-        outStr += '第' + counter.toString() + '断面:' + elem + ';'
-        counter += 1
-      })
-
-      return outStr
-    }
-  }
-
-  private paramData1 = [];
-
-    public updateParamsData(paramData) {
-      this.paramData1 = paramData
-    }
-
-    public beforeOnReset() {
-      let yhdgf = this.$refs.yhdgf as any
-      yhdgf.removeAllField()
-    }
-
-    public beforeOnDemo() {
-      let yhdgf = this.$refs.yhdgf as any
-      yhdgf.removeAllField()
-
-      yhdgf.addFieldWithData(10.054, 28.72)
-      yhdgf.addFieldWithData(6.515, 35.4566)
-      yhdgf.addFieldWithData(7, 33)
-      yhdgf.addFieldWithData(7.92, 29.1667)
-    }
-}
 </script>

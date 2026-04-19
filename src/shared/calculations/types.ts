@@ -16,9 +16,31 @@ export interface FieldSchema {
   options?: SelectOption[];
 }
 
-export interface ResultSchema {
-  key: string;
+export interface DerivedFieldRule<TState = Record<string, any>> {
+  deps: string[];
+  targets: string[];
+  apply: (state: TState) => Partial<TState>;
+}
+
+export interface ResultSummaryItem<TOutput = any> {
+  key?: string;
   label: string;
+  latex?: string;
+  getValue?: (output: TOutput) => unknown;
+  format?: (value: unknown, output: TOutput) => string;
+}
+
+export interface ResultListSchema<TOutput = any> {
+  key?: string;
+  label: string;
+  getItems?: (output: TOutput) => unknown[];
+  itemLabel?: (item: unknown, index: number, output: TOutput) => string;
+  itemValue?: (item: unknown, index: number, output: TOutput) => string;
+}
+
+export interface ResultSchema<TOutput = any> {
+  summary?: ResultSummaryItem<TOutput>[];
+  lists?: ResultListSchema<TOutput>[];
 }
 
 export interface DemoCase<TInput = Record<string, any>> {
@@ -36,8 +58,9 @@ export interface CalculationDefinition<TInput = Record<string, any>, TOutput = s
   title: string;
   fields: FieldSchema[];
   formulas: Record<string, any>;
-  result?: ResultSchema;
+  result?: ResultSchema<TOutput>;
   demoCase?: DemoCase<TInput>;
+  derivedFields?: Array<DerivedFieldRule<TInput>>;
   execute: (context: CalculationExecutionContext<TInput>) => TOutput | Promise<TOutput>;
   formatResult?: (result: TOutput) => string;
 }

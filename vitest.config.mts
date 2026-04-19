@@ -6,6 +6,11 @@ export default mergeConfig(viteConfig, defineConfig({
     environment: 'jsdom',
     globals: true,
     include: ['tests/unit/**/*.vitest.spec.ts'],
-    setupFiles: ['tests/unit/setup.ts']
+    setupFiles: ['tests/unit/setup.ts'],
+    server: {
+      deps: {
+        inline: ['element-plus', '@element-plus/icons-vue']
+      }
+    }
   }
 }))

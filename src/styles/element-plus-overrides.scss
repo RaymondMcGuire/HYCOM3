@@ -1,0 +1,15 @@
+:root {
+  --el-color-primary: var(--color-primary);
+  --el-text-color-primary: var(--color-text-primary);
+  --el-text-color-regular: var(--color-text-muted);
+  --el-border-color: var(--color-border);
+  --el-border-color-light: var(--color-border);
+  --el-border-radius-base: var(--radius-md);
+  --el-border-radius-small: var(--radius-sm);
+  --el-fill-color-blank: var(--color-surface);
+}
+
+.el-message,
+.el-message-box {
+  border-radius: var(--radius-md);
+}

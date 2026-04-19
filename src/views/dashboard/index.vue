@@ -13,65 +13,29 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import $ from 'jquery'
-import 'jquery.ripples'
-import { UserModule } from '@/store/modules/user'
-import { removeToken } from '@/utils/auth'
+import { defineComponent } from 'vue'
 
-@Component
-export default class DashboardEditor extends Vue {
-  private browser = {
-    versions: (function() {
-      var u = window.navigator.userAgent
-      var app = window.navigator.appVersion
-      return {
-        trident: u.indexOf('Trident') > -1,
-        presto: u.indexOf('Presto') > -1,
-        webKit: u.indexOf('AppleWebKit') > -1,
-        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') === -1,
-        mobile: !!u.match(/AppleWebKit.*Mobile.*/),
-        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
-        android: u.indexOf('Android') > -1 || u.indexOf('Adr') > -1,
-        iPhone: u.indexOf('iPhone') > -1,
-        iPad: u.indexOf('iPad') > -1,
-        webApp: u.indexOf('Safari') === -1
+export default defineComponent({
+  name: 'DashboardEditor',
+  mounted() {
+    this.dynamicResize()
+    window.addEventListener('resize', this.dynamicResize)
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.dynamicResize)
+  },
+  methods: {
+    dynamicResize() {
+      const hycomElement = this.$refs.hycom as HTMLElement | undefined
+      if (!hycomElement) {
+        return
       }
-    })(),
-    language: navigator.language.toLowerCase()
-  };
 
-  private dynamicResize() {
-    const hycomElement = this.$refs.hycom as HTMLElement
-    if (hycomElement) {
       hycomElement.style.height = '100%'
       hycomElement.style.width = '100%'
     }
   }
-
-  mounted() {
-    this.dynamicResize()
-    window.addEventListener('resize', this.dynamicResize)
-    if (!this.browser.versions.iPhone && !this.browser.versions.android) {
-      this.initRipple()
-    }
-  }
-
-  beforeDestroy() {
-    window.removeEventListener('resize', this.dynamicResize)
-  }
-
-  private initRipple() {
-    const hycomElement = this.$refs.hycom as HTMLElement
-    if (hycomElement) {
-      $(hycomElement).ripples({
-        resolution: 512,
-        dropRadius: 20,
-        perturbance: 0.02
-      })
-    }
-  }
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -92,7 +56,6 @@ export default class DashboardEditor extends Vue {
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
-  transition: background-image 0.3s ease-in-out;
   background-image: url("../../assets/images/HYCOM_3.0.png");
 }
 
@@ -102,7 +65,7 @@ export default class DashboardEditor extends Vue {
   color: white;
   padding: 20px;
   background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
+  border-radius: 8px;
 
   h1 {
     font-size: 24px;

@@ -1,33 +1,46 @@
 <template>
   <div>
     <hycom-form
-      ref="template"
-      :title="title"
-      :data="data"
-      :init-data="initData"
-      :demo-content="demoContent"
-      :demo-result="demoResult"
-      :formulas="formulas"
-      @beforeOnCalculate="beforeOnCalculate"
+      :definition="definition"
+      :state="formState"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { Section2 } from '@/hycom_lib/section2'
 import { jkdkbyType } from '@/hycom_lib/common'
-
 import HycomForm from '@/components/HycomForm/index.vue'
+import {
+  CalculationDefinition,
+  createCalculationState,
+  DemoCase,
+  FieldSchema,
+  ResultSchema
+} from '@/shared/calculations'
 
-@Component({
-  components: {
-    HycomForm
-  }
-})
-export default class Chapter1Section1Sub2 extends Vue {
-  public title = '1.1.2.2 泄流能力计算';
-  public initData = {
+type WideCrestedWeirResult = {
+  raw: string;
+  m: string;
+  Q: string;
+  epsilon: string;
+}
+
+const fields: FieldSchema[] = [
+  { key: '进口底坎边缘', label: '进口底坎边缘', type: 'select' },
+  { key: 'v_0', latex: 'v_0', type: 'number' },
+  { key: 'H', latex: 'H', type: 'number' },
+  { key: 'n', latex: 'n', type: 'number' },
+  { key: 'b', latex: 'b', type: 'number' },
+  { key: 'B', latex: 'B', type: 'number' },
+  { key: 'd', latex: 'd', type: 'number' },
+  { key: 'K', latex: 'K', type: 'number' },
+  { key: 'P_1', latex: 'P_1', type: 'number' }
+]
+
+const demoCase: DemoCase = {
+  values: {
     进口底坎边缘: jkdkbyType.yj,
     v_0: 3,
     H: 4.8,
@@ -37,58 +50,71 @@ export default class Chapter1Section1Sub2 extends Vue {
     d: 1.5,
     K: 0.1,
     P_1: 5.2
-  };
-  public data = {
-    进口底坎边缘: '',
-    v_0: '',
-    H: '',
-    n: '',
-    b: '',
-    B: '',
-    d: '',
-    K: '',
-    P_1: ''
-  };
-
-  public formulas = {
-    1: 'Q :流量,m^3/s',
-    2: 'm :流量系数',
-    3: '\\varepsilon :侧收缩系数',
-    5: 'n :孔数',
-    4: 'b :单孔宽度,m',
-    6: 'H :堰上水头,m,取堰前3H_{0} \\sim 6H_{0}处',
-    7: 'v_0 :行进流速,m/s',
-    8: 'g :重力加速度,m/s^2,取9.8',
-    9: 'P_1 :上游堰高,m',
-    10: 'K :闸墩形状影响系数',
-    11: 'd :中墩厚度',
-    12: 'B :堰上游距堰3H_{0} \\sim 4H_{0} 处的宽度'
-  };
-
-  public demoContent =
-    '某水利工程水库校核水位615m,溢洪道进水口控制堰为宽顶堰,堰长20.5m,进口底板高程605m,堰顶高程610.2m,进口底坎边缘用半径0.8m 圆弧修圆,2孔,单孔宽度11m,闸墩厚度1.5m,K=0.1,引渠宽度28m,计算控制堰侧收缩系数及泄流能力。';
-  public demoResult = '求得控制堰泄流能力为432.612';
-  public beforeOnCalculate() {
-    let objs = Section2.kdyxlnljj(
-      +this.data.v_0,
-      +this.data.H,
-      +this.data.n,
-      +this.data.B,
-      +this.data.b,
-      +this.data.d,
-      +this.data.K,
-      +this.data.P_1,
-      +this.data.进口底坎边缘
-    )
-    let outStr = '流量系数m:'
-    outStr +=
-      objs.m.toFixed(5).toString() +
-      '|泄流能力Q:' +
-      objs.Q.toFixed(5).toString() +
-       '|侧收缩系数ε:' +
-      objs.epsilon.toFixed(5).toString()
-    let template = this.$refs.template as any
-    template.form.result = outStr
-  }
+  },
+  description: '某水利工程水库校核水位615m,溢洪道进水口控制堰为宽顶堰,堰长20.5m,进口底板高程605m,堰顶高程610.2m,进口底坎边缘用半径0.8m 圆弧修圆,2孔,单孔宽度11m,闸墩厚度1.5m,K=0.1,引渠宽度28m,计算控制堰侧收缩系数及泄流能力。',
+  expectedResult: '求得控制堰泄流能力为432.01019'
 }
+
+const formulas = {
+  1: 'Q :流量,m^3/s',
+  2: 'm :流量系数',
+  3: '\\varepsilon :侧收缩系数',
+  5: 'n :孔数',
+  4: 'b :单孔宽度,m',
+  6: 'H :堰上水头,m,取堰前3H_{0} \\sim 6H_{0}处',
+  7: 'v_0 :行进流速,m/s',
+  8: 'g :重力加速度,m/s^2,取9.8',
+  9: 'P_1 :上游堰高,m',
+  10: 'K :闸墩形状影响系数',
+  11: 'd :中墩厚度',
+  12: 'B :堰上游距堰3H_{0} \\sim 4H_{0} 处的宽度'
+}
+
+const resultSchema: ResultSchema<WideCrestedWeirResult> = {
+  summary: [
+    { key: 'm', label: 'm', latex: 'm' },
+    { key: 'Q', label: 'Q', latex: 'Q' },
+    { key: 'epsilon', label: 'epsilon', latex: '\\varepsilon' }
+  ]
+}
+
+export default defineComponent({
+  name: 'Section1122Calculator',
+  components: {
+    HycomForm
+  },
+  data() {
+    return {
+      formState: createCalculationState(fields),
+      definition: {
+        title: '1.1.2.2 泄流能力计算',
+        fields,
+        formulas,
+        result: resultSchema,
+        demoCase,
+        execute: ({ input }) => {
+          const result = Section2.kdyxlnljj(
+            Number(input.v_0),
+            Number(input.H),
+            Number(input.n),
+            Number(input.B),
+            Number(input.b),
+            Number(input.d),
+            Number(input.K),
+            Number(input.P_1),
+            Number(input['进口底坎边缘'])
+          )
+
+          return {
+            raw: `流量系数m:${result.m.toFixed(5)}|泄流能力Q:${result.Q.toFixed(5)}|侧收缩系数ε:${result.epsilon.toFixed(5)}`,
+            m: result.m.toFixed(5),
+            Q: result.Q.toFixed(5),
+            epsilon: result.epsilon.toFixed(5)
+          }
+        },
+        formatResult: (result: WideCrestedWeirResult) => result.raw
+      } as CalculationDefinition<Record<string, any>, WideCrestedWeirResult>
+    }
+  }
+})
 </script>

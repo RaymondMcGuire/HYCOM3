@@ -1,49 +1,53 @@
-import { Component, Vue, Watch } from 'vue-property-decorator'
-import { DeviceType, AppModule } from '@/store/modules/app'
+import { defineComponent } from 'vue'
+import { DeviceType, SidebarState } from '@/store/modules/app'
+import { useLayoutState } from '@/app/state'
 
-const WIDTH = 992 // refer to Bootstrap's responsive design
+const WIDTH = 768
 
-@Component
-export default class ResizeHandlerMixin extends Vue {
-  get device() {
-    return AppModule.device
-  }
+const layoutState = useLayoutState()
 
-  get sidebar() {
-    return AppModule.sidebar
-  }
-
-  @Watch('$route')
-  private OnRouteChange() {
-    if (this.device === DeviceType.Mobile && this.sidebar.opened) {
-      AppModule.CloseSideBar(false)
+export default defineComponent({
+  computed: {
+    device(): DeviceType {
+      return layoutState.device
+    },
+    sidebar(): SidebarState {
+      return layoutState.sidebar
     }
-  }
-
-  private beforeMount() {
+  },
+  watch: {
+    $route() {
+      if (this.device === DeviceType.Mobile && this.sidebar.opened) {
+        void layoutState.closeSideBar(false)
+      }
+    }
+  },
+  beforeMount() {
     window.addEventListener('resize', this.resizeHandler)
-  }
-
-  private mounted() {
+  },
+  mounted() {
     const isMobile = this.isMobile()
     if (isMobile) {
-      AppModule.ToggleDevice(DeviceType.Mobile)
-      AppModule.CloseSideBar(true)
+      void layoutState.toggleDevice(DeviceType.Mobile)
+      void layoutState.closeSideBar(true)
     }
-  }
-
-  private isMobile() {
-    const rect = document.body.getBoundingClientRect()
-    return rect.width - 1 < WIDTH
-  }
-
-  private resizeHandler() {
-    if (!document.hidden) {
-      const isMobile = this.isMobile()
-      AppModule.ToggleDevice(isMobile ? DeviceType.Mobile : DeviceType.Desktop)
-      if (isMobile) {
-        AppModule.CloseSideBar(true)
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.resizeHandler)
+  },
+  methods: {
+    isMobile(): boolean {
+      const rect = document.body.getBoundingClientRect()
+      return rect.width - 1 < WIDTH
+    },
+    resizeHandler() {
+      if (!document.hidden) {
+        const isMobile = this.isMobile()
+        void layoutState.toggleDevice(isMobile ? DeviceType.Mobile : DeviceType.Desktop)
+        if (isMobile) {
+          void layoutState.closeSideBar(true)
+        }
       }
     }
   }
-}
+})

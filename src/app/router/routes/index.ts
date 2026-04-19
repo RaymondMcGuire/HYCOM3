@@ -1,4 +1,4 @@
-import { RouteConfig } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 import { coreRoutes, fallbackRoute } from './core'
 import { section1Routes } from './section1'
 import { section2Routes } from './section2'
@@ -9,7 +9,7 @@ import { section6Routes } from './section6'
 import { section7Routes } from './section7'
 import { section8Routes } from './section8'
 
-export const routes: RouteConfig[] = [
+export const routes: RouteRecordRaw[] = [
   ...coreRoutes,
   ...section1Routes,
   ...section2Routes,

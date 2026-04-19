@@ -1,7 +1,15 @@
-import { RouteConfig } from 'vue-router'
+import { h } from 'vue'
+import type { RouteRecordRaw } from 'vue-router'
 import Layout from '@/views/layout/Layout.vue'
 
-export const coreRoutes: RouteConfig[] = [
+const ExternalRedirect = {
+  name: 'ExternalRedirect',
+  render() {
+    return h('div')
+  }
+}
+
+export const coreRoutes: RouteRecordRaw[] = [
   {
     path: '/login',
     component: () => import(/* webpackChunkName: "login" */ '@/views/login/index.vue'),
@@ -34,8 +42,10 @@ export const coreRoutes: RouteConfig[] = [
       },
       {
         path: 'guide',
+        component: ExternalRedirect,
         beforeEnter() {
           location.href = 'https://raymondmcguire.gitee.io/hycom/guide/'
+          return false
         }
       },
       {
@@ -46,8 +56,8 @@ export const coreRoutes: RouteConfig[] = [
   }
 ]
 
-export const fallbackRoute: RouteConfig = {
-  path: '*',
+export const fallbackRoute: RouteRecordRaw = {
+  path: '/:pathMatch(.*)*',
   redirect: '/404',
   meta: { hidden: true }
 }

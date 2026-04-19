@@ -1,13 +1,9 @@
-import { mount, createLocalVue } from '@vue/test-utils'
-import VueRouter from 'vue-router'
-import ElementUI from 'element-ui'
+import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import { createMemoryHistory, createRouter, type RouteRecordRaw } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 
-const localVue = createLocalVue()
-localVue.use(VueRouter)
-localVue.use(ElementUI)
-
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'home',
@@ -46,59 +42,70 @@ const routes = [
     }]
   }]
 
-const router = new VueRouter({
-  routes
-})
-
-describe('Breadcrumb.vue', () => {
-  const wrapper = mount(Breadcrumb, {
-    localVue,
-    router
+async function mountWithRoute(path: string) {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes
   })
 
-  it('dashboard', () => {
-    router.push('/dashboard')
+  router.push(path)
+  await router.isReady()
+
+  const wrapper = mount(Breadcrumb, {
+    global: {
+      plugins: [router]
+    }
+  })
+
+  await nextTick()
+
+  return wrapper
+}
+
+describe('Breadcrumb.vue', () => {
+  it('dashboard', async () => {
+    const wrapper = await mountWithRoute('/dashboard')
     const len = wrapper.findAll('.el-breadcrumb__inner').length
     expect(len).toBe(1)
   })
 
-  it('normal route', () => {
-    router.push('/menu/menu1')
+  it('normal route', async () => {
+    const wrapper = await mountWithRoute('/menu/menu1')
     const len = wrapper.findAll('.el-breadcrumb__inner').length
     expect(len).toBe(2)
   })
 
-  it('nested route', () => {
-    router.push('/menu/menu1/menu1-2/menu1-2-1')
+  it('nested route', async () => {
+    const wrapper = await mountWithRoute('/menu/menu1/menu1-2/menu1-2-1')
     const len = wrapper.findAll('.el-breadcrumb__inner').length
     expect(len).toBe(4)
   })
 
-  it('no meta.title', () => {
-    router.push('/menu/menu1/menu1-2/menu1-2-2')
+  it('no meta.title', async () => {
+    const wrapper = await mountWithRoute('/menu/menu1/menu1-2/menu1-2-2')
     const len = wrapper.findAll('.el-breadcrumb__inner').length
     expect(len).toBe(3)
   })
 
-  it('click link', () => {
-    router.push('/menu/menu1/menu1-2/menu1-2-2')
+  it('click link', async () => {
+    const wrapper = await mountWithRoute('/menu/menu1/menu1-2/menu1-2-2')
     const breadcrumbArray = wrapper.findAll('.el-breadcrumb__inner')
-    const second = breadcrumbArray.at(1)
+    const second = breadcrumbArray.at(1)!
     const href = second.find('a').text()
     expect(href).toBe('menu1')
   })
 
-  it('noredirect', () => {
-    router.push('/menu/menu1/menu1-2/menu1-2-1')
+  it('noredirect', async () => {
+    const wrapper = await mountWithRoute('/menu/menu1/menu1-2/menu1-2-1')
     const breadcrumbArray = wrapper.findAll('.el-breadcrumb__inner')
-    const redirectBreadcrumb = breadcrumbArray.at(2)
+    const redirectBreadcrumb = breadcrumbArray.at(2)!
     expect(redirectBreadcrumb.contains('a')).toBe(false)
   })
 
-  it('last breadcrumb', () => {
-    router.push('/menu/menu1/menu1-2/menu1-2-1')
+  it('last breadcrumb', async () => {
+    const wrapper = await mountWithRoute('/menu/menu1/menu1-2/menu1-2-1')
     const breadcrumbArray = wrapper.findAll('.el-breadcrumb__inner')
-    const redirectBreadcrumb = breadcrumbArray.at(3)
+    const redirectBreadcrumb = breadcrumbArray.at(3)!
     expect(redirectBreadcrumb.contains('a')).toBe(false)
   })
 })

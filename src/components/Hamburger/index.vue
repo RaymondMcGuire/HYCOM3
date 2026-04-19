@@ -12,13 +12,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
 
-@Component
-export default class Hamburger extends Vue {
-  @Prop({ default: false }) private isActive!: boolean;
-  @Prop({ default: null }) private toggleClick!: () => void;
-}
+export default defineComponent({
+  name: 'HamburgerButton',
+  props: {
+    isActive: {
+      type: Boolean,
+      default: false
+    },
+    toggleClick: {
+      type: Function as PropType<() => void>,
+      default: null
+    }
+  }
+})
 </script>
 
 <style lang="scss" scoped>

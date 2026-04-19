@@ -1,12 +1,13 @@
 /* Sidebar */
 
-$sideBarWidth: 420px;
-$subMenuBg:#1f2d3d;
-$subMenuHover:#001528;
-$subMenuActiveText:#f4f4f5;
+$sideBarWidth: var(--layout-sidebar-width);
+$hideSidebarWidth: var(--layout-sidebar-collapsed-width);
+$subMenuBg: var(--layout-sidebar-submenu-bg);
+$subMenuHover: var(--layout-sidebar-submenu-hover);
+$subMenuActiveText: var(--layout-sidebar-submenu-active);
 
 /* Login page */
 
-$loginBg: #2d3a4b;
-$lightGray: #eee;
-$darkGray:#889aa4;
+$loginBg: var(--auth-hero-start);
+$lightGray: var(--auth-accent);
+$darkGray: var(--color-text-muted);

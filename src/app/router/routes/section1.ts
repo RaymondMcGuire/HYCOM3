@@ -1,7 +1,7 @@
-import { RouteConfig } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 import Layout from '@/views/layout/Layout.vue'
 
-export const section1Routes: RouteConfig[] = [
+export const section1Routes: RouteRecordRaw[] = [
   {
     path: '/section1',
     component: Layout,

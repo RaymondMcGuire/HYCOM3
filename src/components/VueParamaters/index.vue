@@ -7,34 +7,37 @@
  * @FilePath: \hycom_app\src\components\VueParamaters\index.vue
 -->
 <template>
-  <el-row :gutter="20">
+  <app-stack gap="12px">
     <div
       v-for="(item, index) in formulas"
       :key="index"
     >
-      <el-col :span="24">
-        <math-jax
-          class="smathjax"
-          :latex="formulas[index]"
-          :block="true"
-        />
-        <br>
-      </el-col>
+      <math-jax
+        class="smathjax"
+        :latex="formulas[index]"
+        :block="true"
+      />
+      <br>
     </div>
-  </el-row>
+  </app-stack>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
+import AppStack from '@/shared/components/layout/AppStack.vue'
 
-@Component({
+export default defineComponent({
+  name: 'VueParamaters',
   components: {
-
+    AppStack
+  },
+  props: {
+    formulas: {
+      type: Object as PropType<Record<string, any>>,
+      required: true
+    }
   }
 })
-export default class VueParamaters extends Vue {
-  @Prop() formulas!: Object;
-}
 </script>
 
 <style lang="scss" scoped>

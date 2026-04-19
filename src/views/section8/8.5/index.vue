@@ -8,14 +8,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { Chapter7 } from '@/hycom_lib/chapter7'
 import HycomForm from '@/components/HycomForm/index.vue'
 import {
   CalculationDefinition,
   createCalculationState,
   DemoCase,
-  FieldSchema
+  FieldSchema,
+  parseDelimitedNumberList
 } from '@/shared/calculations'
 
 const fields: FieldSchema[] = [
@@ -45,32 +46,27 @@ const formulas = {
   5: 'h_y :管道沿程水头损失,m'
 }
 
-function parseNumberList(raw: string): number[] {
-  return raw
-    .split(',')
-    .map((item) => parseFloat(item.trim()))
-    .filter((item) => !Number.isNaN(item))
-}
-
-@Component({
+export default defineComponent({
+  name: 'Section85Calculator',
   components: {
     HycomForm
-  }
-})
-export default class Chapter9Section3 extends Vue {
-  public formState = createCalculationState(fields)
-
-  public definition: CalculationDefinition = {
-    title: '8.5 管（渠）道局部水头损失',
-    fields,
-    formulas,
-    demoCase,
-    execute: ({ input }) => {
-      const nj = parseNumberList(String(input.n_j || ''))
-      const xij = parseNumberList(String(input['\\xi_j'] || ''))
-      const values = Chapter7.gdjbss(Number(input.v), nj, xij, Number(input.h_y))
-      return '管道沿程水头损失=' + values[0].toFixed(2).toString()
+  },
+  data() {
+    return {
+      formState: createCalculationState(fields),
+      definition: {
+        title: '8.5 管（渠）道局部水头损失',
+        fields,
+        formulas,
+        demoCase,
+        execute: ({ input }) => {
+          const nj = parseDelimitedNumberList(input.n_j, ',')
+          const xij = parseDelimitedNumberList(input['\\xi_j'], ',')
+          const values = Chapter7.gdjbss(Number(input.v), nj, xij, Number(input.h_y))
+          return `管道沿程水头损失=${values[0].toFixed(2)}`
+        }
+      } as CalculationDefinition
     }
   }
-}
+})
 </script>

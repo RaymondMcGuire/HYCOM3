@@ -13,27 +13,41 @@
       :definition="definition"
       :state="formState"
     >
-      <div slot="table_fir_anchor">
-        <h3>掺气点位置与台阶高度和临界水深函数关系图(图2.6.6):</h3>
-        <br>
-        <LineChart />
-      </div>
+      <template #table_fir_anchor>
+        <div>
+          <h3>掺气点位置与台阶高度和临界水深函数关系图(图2.6.6):</h3>
+          <br>
+          <LineChart />
+        </div>
+      </template>
     </hycom-form>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import { Chapter2 } from '@/hycom_lib/chapter2'
 
 import HycomForm from '@/components/HycomForm/index.vue'
 import LineChart from './components/LineChart.vue'
 import {
   CalculationDefinition,
+  createAssignmentResultSchema,
   createCalculationState,
+  DerivedFieldRule,
   DemoCase,
-  FieldSchema
+  FieldSchema,
+  parseAssignmentResult
 } from '@/shared/calculations'
+
+type AerationSummaryResult = {
+  raw: string;
+  L1?: string;
+  L2?: string;
+  d0?: string;
+  v0?: string;
+  eta?: string;
+}
 
 const fields: FieldSchema[] = [
   { key: 'Q', latex: 'Q', type: 'number' },
@@ -54,7 +68,7 @@ const demoCase: DemoCase = {
     '\\frac{L1}{h}': undefined
   },
   description: '某碾压混凝土(RCC)重力坝,最大坝高50m,坝顶宽8m,下游坝坡设置台阶消能工,每个台阶步高0.9m、步长0.72m,单宽流量3.14m^3/s-m,堰上水头1.7m,计算台阶消能工初始掺气点位置、水深、流速及均匀掺气断面位置、水深、流速、消能效率。',
-  expectedResult: '求得L1=11.2500; L2=14.4677; d0=0.5994; v0=41.9091; eta=0.9470'
+  expectedResult: '求得L1=9.8095; L2=14.4677; d0=0.5994; v0=41.9091; eta=0.9470'
 }
 
 const formulas = {
@@ -70,47 +84,70 @@ const formulas = {
   9: 'b: 溢流泄槽宽度'
 }
 
-@Component({
+const resultSchema = createAssignmentResultSchema<AerationSummaryResult>([
+  { key: 'L1', label: 'L1', latex: 'L_1' },
+  { key: 'L2', label: 'L2', latex: 'L_2' },
+  { key: 'd0', label: 'd0', latex: 'd_0' },
+  { key: 'v0', label: 'v0', latex: 'v_0' },
+  { key: 'eta', label: 'eta', latex: '\\eta' }
+])
+
+function curve266(x: number) {
+  return -0.04470359 * Math.pow(x, 5) + 0.74138603 * Math.pow(x, 4) - 3.45303124 * Math.pow(x, 3) + 7.83388746 * Math.pow(x, 2) - 2.07367457 * x + 7.20028475
+}
+
+const derivedFields: Array<DerivedFieldRule<Record<string, any>>> = [
+  {
+    deps: ['Q', 'b', 'h'],
+    targets: ['\\frac{L1}{h}'],
+    apply: (state) => {
+      if (state.b && state.Q && state.h) {
+        const q = Number(state.Q) / Number(state.b)
+        const dcDivH = Math.pow(q * q / 9.8, 1 / 3) / Number(state.h)
+        return {
+          '\\frac{L1}{h}': Number(curve266(dcDivH).toFixed(4))
+        }
+      }
+
+      return {
+        '\\frac{L1}{h}': undefined
+      }
+    }
+  }
+]
+
+export default defineComponent({
+  name: 'Section162Calculator',
   components: {
     HycomForm,
     LineChart
+  },
+  data() {
+    return {
+      formState: createCalculationState(fields),
+      definition: {
+        title: '1.6.2 南京水利科学研究院方法计算',
+        fields,
+        formulas,
+        result: resultSchema,
+        demoCase,
+        derivedFields,
+        execute: ({ input }) => {
+          const raw = Chapter2.njslkxy263(
+            Number(input.Q),
+            Number(input.b),
+            Number(input.h),
+            Number(input.H_堰),
+            Number(input.H),
+            Number(input['\\frac{L1}{h}'])
+          )
+          return raw.includes('=')
+            ? parseAssignmentResult<AerationSummaryResult>(raw)
+            : { raw }
+        },
+        formatResult: (result: AerationSummaryResult) => result.raw
+      } as CalculationDefinition<Record<string, any>, AerationSummaryResult>
+    }
   }
 })
-export default class Chapter2Section6Sub2 extends Vue {
-  public formState = createCalculationState(fields)
-
-  public definition: CalculationDefinition = {
-    title: '1.6.2 南京水利科学研究院方法计算',
-    fields,
-    formulas,
-    demoCase,
-    execute: ({ input }) => {
-      return Chapter2.njslkxy263(
-        Number(input.Q),
-        Number(input.b),
-        Number(input.h),
-        Number(input.H_堰),
-        Number(input.H),
-        Number(input['\\frac{L1}{h}'])
-      )
-    }
-  }
-
-  private curve266(x:number) {
-    return -0.04470359 * Math.pow(x, 5) + 0.74138603 * Math.pow(x, 4) - 3.45303124 * Math.pow(x, 3) + 7.83388746 * Math.pow(x, 2) - 2.07367457 * x + 7.20028475
-  }
-
-  @Watch('formState.Q')
-  @Watch('formState.b')
-  @Watch('formState.h')
-  public onVarQChange() {
-    if (this.formState.b && this.formState.Q && this.formState.h) {
-      const q = Number(this.formState.Q) / Number(this.formState.b)
-      const dcDivH = Math.pow(q * q / 9.8, 1 / 3) / Number(this.formState.h)
-      this.formState['\\frac{L1}{h}'] = Number(this.curve266(dcDivH).toFixed(4))
-    } else {
-      this.formState['\\frac{L1}{h}'] = undefined
-    }
-  }
-}
 </script>

@@ -1,4 +1,4 @@
-<!--
+﻿<!--
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2022-07-16 22:00:43
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
@@ -33,7 +33,7 @@
       v-for="(input, index) in params"
       :key="`input-${index}`"
     >
-      <el-col :span="4">
+      <div class="dynamic-field-inline">
         <el-input
           v-model="input.value"
           type="number"
@@ -62,53 +62,19 @@
             d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-9.414l2.828-2.829 1.415 1.415L13.414 12l2.829 2.828-1.415 1.415L12 13.414l-2.828 2.829-1.415-1.415L10.586 12 7.757 9.172l1.415-1.415L12 10.586z"
           />
         </svg>
-      </el-col>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { createDynamicParamsComponent } from '@/shared/components/pressurizedHydraulics/factory'
 
-@Component({
-  name: 'DynamicRangeParams'
+export default createDynamicParamsComponent({
+  name: 'DynamicRangeParams',
+  createEmptyItem: () => ({ value: '' }),
+  addFieldKeys: ['value']
 })
-
-export default class DynamicRangeParams extends Vue {
-    @Prop({ default: '' }) explainText!: string;
-  @Prop({ default: true }) dynamicBtn!: boolean;
-  @Prop({ default: 1 }) maxValue!: number;
-  @Prop({ default: 0 }) minValue!: number;
-  @Prop({ default: 0.1 }) stepValue!: number;
-
-  public params:any= [];
-
-  public addField() {
-    this.params.push({ value: '' })
-  }
-
-  public removeField(index) {
-    this.params.splice(index, 1)
-  }
-
-  public onParamsDataChange() {
-    this.$emit('updateParamsData', this.params)
-  }
-  public removeAllField() {
-    let n = this.params.length
-    for (let index = 0; index < n; index++) {
-      this.params.splice(0, 1)
-    }
-  }
-
-  public updateValue(event) {
-    const value = event.target.value
-    if (value > event.target.max) {
-      // event.target.value = event.target.max
-    }
-    this.$forceUpdate()
-  }
-}
 </script>
 
 <style lang="scss">
@@ -119,3 +85,4 @@ input[type=number]::-webkit-outer-spin-button {
 
 }
 </style>
+

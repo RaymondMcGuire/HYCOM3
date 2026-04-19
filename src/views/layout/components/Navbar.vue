@@ -16,127 +16,114 @@
           :src="avatar"
           class="user-avatar"
         >
-        <i class="el-icon-caret-bottom" />
+        <span class="caret-bottom" />
       </div>
-      <el-dropdown-menu
-        slot="dropdown"
-        class="user-dropdown"
-      >
-        <router-link
-          class="inlineBlock"
-          to="/"
-        >
-          <el-dropdown-item> HYCOM3.0 </el-dropdown-item>
-        </router-link>
-        <router-link
-          class="inlineBlock"
-          to="/contact"
-        >
-          <el-dropdown-item> 意见反馈 </el-dropdown-item>
-        </router-link>
-
-        <router-link
-          class="inlineBlock"
-          to="/guide"
-        >
-          <el-dropdown-item> 操作指南 </el-dropdown-item>
-        </router-link>
-
-        <div v-if="usrname === '超级用户'">
+      <template #dropdown>
+        <el-dropdown-menu class="user-dropdown">
           <router-link
             class="inlineBlock"
-            to="/admin_panel"
+            to="/"
           >
-            <el-dropdown-item> 控制面板 </el-dropdown-item>
+            <el-dropdown-item> HYCOM3.0 </el-dropdown-item>
           </router-link>
-        </div>
-        <el-dropdown-item divided>
-          <span
-            style="display: block"
-            @click="logout"
-          >退出</span>
-        </el-dropdown-item>
-      </el-dropdown-menu>
+          <router-link
+            class="inlineBlock"
+            to="/contact"
+          >
+            <el-dropdown-item> 意见反馈 </el-dropdown-item>
+          </router-link>
+
+          <router-link
+            class="inlineBlock"
+            to="/guide"
+          >
+            <el-dropdown-item> 操作指南 </el-dropdown-item>
+          </router-link>
+
+          <div v-if="usrname === '超级用户'">
+            <router-link
+              class="inlineBlock"
+              to="/admin_panel"
+            >
+              <el-dropdown-item> 控制面板 </el-dropdown-item>
+            </router-link>
+          </div>
+          <el-dropdown-item divided>
+            <span
+              style="display: block"
+              @click="logout"
+            >退出</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
     </el-dropdown>
   </div>
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Hamburger from '@/components/Hamburger/index.vue'
-import { Component, Vue } from 'vue-property-decorator'
-import { AppModule } from '@/store/modules/app'
-import { UserModule } from '@/store/modules/user'
 import { authService } from '@/services/authService'
+import { useLayoutState, useSessionState } from '@/app/state'
 
-@Component({
+const layoutState = useLayoutState()
+const sessionState = useSessionState()
+
+export default defineComponent({
+  name: 'LayoutNavbar',
   components: {
     Breadcrumb,
     Hamburger
-  }
-})
-export default class Navbar extends Vue {
-  private usricon: string = '';
-
-  get sidebar() {
-    return AppModule.sidebar
-  }
-
-  get avatar() {
-    if (this.usricon === undefined) {
-      return UserModule.avatar
+  },
+  data() {
+    return {
+      usricon: ''
     }
-
-    return this.usricon
-  }
-
-  get usrname() {
-    return UserModule.name
-  }
-
-  get roles() {
-    return UserModule.roles
-  }
-
-  private toggleSideBar() {
-    AppModule.ToggleSideBar(false)
-  }
-
+  },
+  computed: {
+    sidebar() {
+      return layoutState.sidebar
+    },
+    avatar(): string {
+      return this.usricon || sessionState.avatar
+    },
+    usrname(): string {
+      return sessionState.name
+    },
+    roles(): string[] {
+      return sessionState.roles
+    }
+  },
   created() {
-    this.fetchUsrIcon()
-  }
-
-  private fetchUsrIcon() {
-    authService.fetchCurrentUserAvatar()
-      .then((avatar) => {
+    void this.fetchUsrIcon()
+  },
+  methods: {
+    toggleSideBar() {
+      void layoutState.toggleSideBar(false)
+    },
+    async fetchUsrIcon() {
+      try {
+        const avatar = await authService.fetchCurrentUserAvatar()
         if (avatar) {
           this.usricon = avatar
         }
-      })
-      .catch((error: Error) => {
+      } catch (error) {
         console.log(error)
+      }
+    },
+    logout() {
+      sessionState.logout().then(() => {
+        this.$router.push({ path: '/login' })
       })
+    }
   }
-
-  private logout() {
-    UserModule.LogOut().then(() => {
-      this.$router.push({ path: '/login' })
-    })
-  }
-}
+})
 </script>
 
 <style lang="scss" scoped>
 .navbar {
-  //phone
-  @media screen and (max-width: 768px) {
-    height: 15%;
-  }
-  //pc
-  @media screen and (min-width: 768px) {
-    height: 50px;
-  }
-
+  height: 50px;
   line-height: 50px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
 
@@ -172,11 +159,15 @@ export default class Navbar extends Vue {
         border-radius: 10px;
       }
 
-      .el-icon-caret-bottom {
+      .caret-bottom {
         position: absolute;
         right: -20px;
         top: 25px;
-        font-size: 12px;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid currentColor;
       }
     }
   }

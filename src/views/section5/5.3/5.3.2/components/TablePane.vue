@@ -65,14 +65,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 
-@Component({
+export default defineComponent({
   name: 'TablePane'
-})
-export default class TablePane extends Vue {
-  @Prop({ default: 't1' }) private type!: string;
-
+  ,
+  props: {
+    type: {
+      type: String,
+      default: 't1'
+    }
+  },
   data() {
     return {
       table621: [
@@ -135,5 +138,5 @@ export default class TablePane extends Vue {
       ]
     }
   }
-}
+})
 </script>

@@ -31,9 +31,10 @@
 
     <div
       v-for="(input, index) in params"
+      class="dynamic-field-grid"
       :key="`input-${index}`"
     >
-      <el-col :span="2">
+      <div class="dynamic-field-grid__labels">
         <el-form-item>
           <math-jax :latex="'\\omega^1_'+(index+1)+''" />
         </el-form-item>
@@ -47,9 +48,9 @@
         <el-form-item>
           <math-jax :latex="'d_'+(index+1)+''" />
         </el-form-item>
-      </el-col>
+      </div>
 
-      <el-col :span="10">
+      <div class="dynamic-field-grid__inputs">
         <el-form-item>
           <el-input
             v-model="input.omega1"
@@ -104,45 +105,17 @@
             d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-9.414l2.828-2.829 1.415 1.415L13.414 12l2.829 2.828-1.415 1.415L12 13.414l-2.828 2.829-1.415-1.415L10.586 12 7.757 9.172l1.415-1.415L12 10.586z"
           />
         </svg>
-      </el-col>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { createDynamicParamsComponent } from '@/shared/components/pressurizedHydraulics/factory'
 
-// 圆形渐缩段
-@Component({
+export default createDynamicParamsComponent({
   name: 'DynamicYxjsdParams',
-  components: {
-
-  }
+  createEmptyItem: () => ({ omega1: '', omega2: '', alpha: '', d: '' }),
+  addFieldKeys: ['omega1', 'omega2', 'alpha', 'd']
 })
-
-export default class DynamicYXJSDParams extends Vue {
-    @Prop({ default: '' }) explainText!: string;
-  @Prop({ default: true }) dynamicBtn!: boolean;
-
- public params:any= [];
-
- public addField() {
-   this.params.push({ omega1: '', omega2: '', alpha: '', d: '' })
- }
-
- public removeField(index) {
-   this.params.splice(index, 1)
- }
-
- public removeAllField() {
-   let n = this.params.length
-   for (let index = 0; index < n; index++) {
-     this.params.splice(0, 1)
-   }
- }
-
- public onParamsDataChange() {
-   this.$emit('updateParamsData', this.params)
- }
-}
 </script>

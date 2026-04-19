@@ -1,20 +1,24 @@
 <template>
-  <el-card class="box-card">
-    <div
-      slot="header"
-      class="clearfix"
-    >
-      <h3>6 渠道水力学计算</h3>
-    </div>
-    <transition
-      name="fade-transform"
-      mode="out-in"
-    >
-      <router-view />
-    </transition>
-  </el-card>
+  <page-shell title="6 渠道水力学计算">
+    <router-view v-slot="{ Component }">
+      <transition
+        name="fade-transform"
+        mode="out-in"
+      >
+        <component :is="Component" />
+      </transition>
+    </router-view>
+  </page-shell>
 </template>
 
 <script lang="ts">
-export default {}
+import { defineComponent } from 'vue'
+import PageShell from '@/shared/components/layout/PageShell.vue'
+
+export default defineComponent({
+  name: 'Section6Layout',
+  components: {
+    PageShell
+  }
+})
 </script>
