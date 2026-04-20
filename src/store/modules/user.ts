@@ -75,12 +75,12 @@ export const useUserStore = defineStore('user', {
       }
     },
     async logOut() {
-      if (getToken() === null) {
-        throw Error('LogOut: token is undefined!')
+      try {
+        await authService.logout()
+      } finally {
+        removeToken()
+        this.clearSession()
       }
-
-      await authService.logout()
-      this.clearSession()
     }
   }
 })

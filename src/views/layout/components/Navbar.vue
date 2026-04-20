@@ -10,6 +10,7 @@
     <el-dropdown
       class="avatar-container"
       trigger="click"
+      @command="handleCommand"
     >
       <div class="avatar-wrapper">
         <img
@@ -20,39 +21,26 @@
       </div>
       <template #dropdown>
         <el-dropdown-menu class="user-dropdown">
-          <router-link
-            class="inlineBlock"
-            to="/"
+          <el-dropdown-item command="home">
+            HYCOM3.0
+          </el-dropdown-item>
+          <el-dropdown-item command="contact">
+            意见反馈
+          </el-dropdown-item>
+          <el-dropdown-item command="guide">
+            操作指南
+          </el-dropdown-item>
+          <el-dropdown-item
+            v-if="roles.includes('admin')"
+            command="admin_panel"
           >
-            <el-dropdown-item> HYCOM3.0 </el-dropdown-item>
-          </router-link>
-          <router-link
-            class="inlineBlock"
-            to="/contact"
+            控制面板
+          </el-dropdown-item>
+          <el-dropdown-item
+            divided
+            command="logout"
           >
-            <el-dropdown-item> 意见反馈 </el-dropdown-item>
-          </router-link>
-
-          <router-link
-            class="inlineBlock"
-            to="/guide"
-          >
-            <el-dropdown-item> 操作指南 </el-dropdown-item>
-          </router-link>
-
-          <div v-if="roles.includes('admin')">
-            <router-link
-              class="inlineBlock"
-              to="/admin_panel"
-            >
-              <el-dropdown-item> 控制面板 </el-dropdown-item>
-            </router-link>
-          </div>
-          <el-dropdown-item divided>
-            <span
-              style="display: block"
-              @click="logout"
-            >退出</span>
+            退出
           </el-dropdown-item>
         </el-dropdown-menu>
       </template>
@@ -68,6 +56,12 @@ import { useLayoutState, useSessionState } from '@/app/state'
 
 const layoutState = useLayoutState()
 const sessionState = useSessionState()
+const commandPathMap = {
+  home: '/',
+  contact: '/contact',
+  guide: '/guide',
+  admin_panel: '/admin_panel'
+} as const
 
 export default defineComponent({
   name: 'LayoutNavbar',
@@ -93,10 +87,26 @@ export default defineComponent({
     toggleSideBar() {
       void layoutState.toggleSideBar(false)
     },
-    logout() {
-      sessionState.logout().then(() => {
-        this.$router.push({ path: '/login' })
-      })
+    async handleCommand(command: string) {
+      if (command === 'logout') {
+        await this.logout()
+        return
+      }
+
+      const targetPath = commandPathMap[command as keyof typeof commandPathMap]
+      if (targetPath) {
+        await this.$router.push({ path: targetPath })
+      }
+    },
+    async logout() {
+      try {
+        await sessionState.logout()
+      } catch (error) {
+        console.warn('Logout fallback to local session clear:', error)
+        await sessionState.clearLocalSession()
+      } finally {
+        await this.$router.replace({ path: '/login' })
+      }
     }
   }
 })

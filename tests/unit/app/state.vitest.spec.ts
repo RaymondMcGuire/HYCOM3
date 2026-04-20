@@ -73,4 +73,26 @@ describe('app/state facades', () => {
     expect(logoutSpy).toHaveBeenCalledTimes(1)
     expect(sessionState.roles).toEqual([])
   })
+
+  it('still clears the session when the persisted token is already gone', async () => {
+    const sessionState = useSessionState()
+    const logoutSpy = vi.spyOn(authService, 'logout').mockResolvedValue()
+    vi.spyOn(authService, 'fetchCurrentProfile').mockResolvedValue({
+      token: 'lc-user-session',
+      role: 'developer',
+      name: '开发者',
+      avatar: 'avatar.png',
+      intro: '开发者'
+    })
+
+    setToken('lc-user-session', 60)
+    await sessionState.fetchProfile()
+    removeToken()
+
+    await expect(sessionState.logout()).resolves.toBeUndefined()
+
+    expect(logoutSpy).toHaveBeenCalledTimes(1)
+    expect(sessionState.token).toBe('')
+    expect(sessionState.roles).toEqual([])
+  })
 })
