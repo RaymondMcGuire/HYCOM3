@@ -8,9 +8,6 @@
       :show-timeout="200"
       :default-active="$route.path"
       :collapse="isCollapse"
-      background-color="#304156"
-      text-color="#bfcbd9"
-      active-text-color="#409EFF"
       mode="vertical"
     >
       <sidebar-item
@@ -64,13 +61,21 @@ export default defineComponent({
 
 .layout-sidebar {
   height: 100%;
+  background-color: var(--layout-sidebar-bg);
 
   :deep(.scrollbar-wrapper) {
+    height: 100%;
+    background-color: var(--layout-sidebar-bg);
     overflow-x: hidden !important;
   }
 
+  :deep(.el-scrollbar__wrap) {
+    background-color: var(--layout-sidebar-bg);
+  }
+
   :deep(.el-scrollbar__view) {
-    height: 100%;
+    min-height: 100%;
+    background-color: var(--layout-sidebar-bg);
   }
 
   :deep(.el-scrollbar__bar.is-vertical) {
@@ -83,15 +88,33 @@ export default defineComponent({
 }
 
 .sidebar-menu {
+  --el-menu-bg-color: var(--layout-sidebar-bg);
+  --el-menu-text-color: var(--layout-sidebar-text);
+  --el-menu-hover-text-color: var(--layout-sidebar-text-hover);
+  --el-menu-active-color: var(--layout-sidebar-text-active);
+  --el-menu-hover-bg-color: var(--layout-sidebar-submenu-hover);
   border: none;
-  height: 100%;
+  min-height: 100%;
   width: 100% !important;
+  background-color: var(--layout-sidebar-bg);
 
   :deep(.el-menu-item),
   :deep(.el-sub-menu__title) {
     display: flex;
     align-items: center;
     min-width: 0;
+    color: var(--layout-sidebar-text);
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  :deep(.el-menu-item:hover),
+  :deep(.el-sub-menu__title:hover) {
+    color: var(--layout-sidebar-text-hover);
+  }
+
+  :deep(.el-menu-item.is-active),
+  :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
+    color: var(--layout-sidebar-text-active);
   }
 
   :deep(.el-menu-item > span),

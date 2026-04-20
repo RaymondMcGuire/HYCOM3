@@ -49,18 +49,17 @@ export const useUserStore = defineStore('user', {
       this.clearSession()
     },
     async getUserInfo() {
-      const token = getToken() || this.token
-      if (!token) {
+      if (!getToken() && !this.token) {
         throw Error('GetUserInfo: token is undefined!')
       }
 
-      const data = authService.getProfileByToken(token)
+      const data = await authService.fetchCurrentProfile()
       const roles = [data.role]
       if (roles.length === 0) {
         throw Error('GetUserInfo: roles must be a non-null array!')
       }
 
-      this.setToken(token)
+      this.setToken(data.token)
       this.setProfile({
         roles,
         name: data.name,

@@ -10,7 +10,7 @@
           align="center"
         >
           <template #default="scope">
-            {{ scope.row.name }}
+            {{ scope.row.to_name }}
           </template>
         </el-table-column>
 
@@ -19,7 +19,7 @@
           align="center"
         >
           <template #default="scope">
-            {{ scope.row.email }}
+            {{ scope.row.email_address }}
           </template>
         </el-table-column>
 

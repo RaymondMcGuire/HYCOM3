@@ -1,4 +1,4 @@
-import { runtimeConfig } from '@/app/config/runtime';
+import { getRuntimeConfig } from '@/app/config/runtime';
 import { sendFeedbackEmail } from '@/integrations/emailjs/client';
 import { getLeanCloud } from '@/integrations/leancloud/client';
 import { normalizeServiceError } from '@/services/errors';
@@ -13,6 +13,7 @@ export interface FeedbackSubmission {
 export const feedbackService = {
   async submit(payload: FeedbackSubmission): Promise<void> {
     const AV = getLeanCloud();
+    const runtimeConfig = getRuntimeConfig();
     const FeedbackForm = AV.Object.extend(runtimeConfig.leancloud.feedbackClass);
     const record = new FeedbackForm();
 

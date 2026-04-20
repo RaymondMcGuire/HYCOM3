@@ -45,7 +45,7 @@ describe('components/MavEditor', () => {
     }
 
     const wrapper = mount(MavEditor, {
-      propsData: { config }
+      props: { config }
     })
 
     await wrapper.vm.$nextTick()
@@ -62,6 +62,7 @@ describe('components/MavEditor', () => {
     expect(wrapper.find('textarea').exists()).toBe(true)
 
     const textarea = wrapper.find('textarea')
+    expect((textarea.element as HTMLTextAreaElement).value).toBe('<p>initial $x$</p>')
     await textarea.setValue('<p>updated $y$</p>')
 
     expect(config.value).toBe('<p>updated $y$</p>')
@@ -88,11 +89,18 @@ describe('components/MavEditor', () => {
     }
 
     const wrapper = mount(MavEditor, {
-      propsData: { config }
+      props: { config }
     })
 
-    await wrapper.findAll('button').at(2)!.trigger('click')
+    await wrapper.findAll('button').at(0)!.trigger('click')
+    await wrapper.vm.$nextTick()
 
-    expect(generatePdf).toHaveBeenCalledWith('<p>pdf $x$</p>', config)
+    const textarea = wrapper.find('textarea')
+    await textarea.setValue('<p>pdf $y$</p><p>手动追加</p>')
+
+    await wrapper.findAll('button').at(2)!.trigger('click')
+    await Promise.resolve()
+
+    expect(generatePdf).toHaveBeenCalledWith('<p>pdf $y$</p><p>手动追加</p>', config)
   })
 })

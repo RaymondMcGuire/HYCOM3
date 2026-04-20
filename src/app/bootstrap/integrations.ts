@@ -7,6 +7,11 @@ export function initializeAppIntegrations() {
     return
   }
 
-  initializeLeanCloud()
+  try {
+    initializeLeanCloud()
+  } catch (error) {
+    console.warn('LeanCloud bootstrap skipped:', error)
+  }
+
   integrationsInitialized = true
 }

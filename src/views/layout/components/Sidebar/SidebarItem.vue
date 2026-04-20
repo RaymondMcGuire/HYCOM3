@@ -169,10 +169,6 @@ export default defineComponent({
 .menu-wrapper {
   min-width: 0;
 
-  :deep(.sidebar-submenu.is-active > .el-sub-menu__title) {
-    color: $subMenuActiveText !important;
-  }
-
   &.full-mode {
     .sidebar-link-item {
       background-color: $subMenuBg !important;

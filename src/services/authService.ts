@@ -1,9 +1,14 @@
 import defaultAvatar from '@/assets/images/icon/wx_icon.png';
-import { runtimeConfig } from '@/app/config/runtime';
-import { getLeanCloud } from '@/integrations/leancloud/client';
+import { getRuntimeConfig } from '@/app/config/runtime';
+import { Identicon } from '@/identicon_lib/identicon';
+import {
+  AV,
+  getCurrentLeanCloudUser,
+  getLeanCloud,
+  runLeanCloudFunction
+} from '@/integrations/leancloud/client';
 import { normalizeServiceError, ServiceError } from '@/services/errors';
 import { getToken, removeToken, setToken } from '@/utils/auth';
-import { Identicon } from '@/identicon_lib/identicon';
 
 export type AuthRole = 'admin' | 'developer';
 
@@ -32,29 +37,68 @@ export interface CurrentUserSummary {
   role: AuthRole;
 }
 
-const TOKEN_PROFILES: Record<string, AuthProfile> = {
-  'admin-token': {
-    token: 'admin-token',
+type CurrentProfileResponse = {
+  username: string;
+  role: string;
+  avatar?: string;
+  intro?: string;
+}
+
+const ACTIVE_SESSION_TOKEN = 'lc-user-session';
+
+type CloudQueryResult = {
+  results?: Array<{
+    attributes?: Record<string, unknown>;
+  }>;
+}
+
+const TEST_SESSION_PROFILES: Record<string, AuthProfile> = {
+  'lc-test-session:admin': {
+    token: 'lc-test-session:admin',
     role: 'admin',
-    name: '超级用户',
+    name: 'test-admin',
     avatar: defaultAvatar,
-    intro: '超级用户'
+    intro: '测试管理员'
   },
-  'developer-token': {
-    token: 'developer-token',
+  'lc-test-session:developer': {
+    token: 'lc-test-session:developer',
     role: 'developer',
-    name: '开发者',
+    name: 'test-developer',
     avatar: defaultAvatar,
-    intro: '开发者'
+    intro: '测试开发者'
   }
 };
 
-function getRoleFromAuthValue(authValue: unknown): AuthRole {
-  return authValue === runtimeConfig.auth.adminAuthValue ? 'admin' : 'developer';
+function shouldUseCloudFunctions(): boolean {
+  return getRuntimeConfig().leancloud.cloudFunctionsEnabled;
 }
 
-function getTokenFromRole(role: AuthRole): string {
-  return role === 'admin' ? 'admin-token' : 'developer-token';
+function normalizeRole(role: unknown): AuthRole {
+  if (role === 'admin' || role === 'developer') {
+    return role;
+  }
+
+  throw new ServiceError('用户角色无效', 'AUTH_ROLE_INVALID');
+}
+
+function getRoleFromAuthValue(authValue: unknown): AuthRole {
+  return authValue === getRuntimeConfig().auth.adminAuthValue ? 'admin' : 'developer';
+}
+
+function buildSessionToken(user: InstanceType<typeof AV.User>): string {
+  return user.id ? `${ACTIVE_SESSION_TOKEN}:${user.id}` : ACTIVE_SESSION_TOKEN;
+}
+
+function normalizeProfileResponse(response: CurrentProfileResponse, token: string): AuthProfile {
+  const role = normalizeRole(response.role);
+
+  return {
+    token,
+    role,
+    name: response.username,
+    avatar: response.avatar || defaultAvatar,
+    intro: response.intro || (role === 'admin' ? '超级用户' : '开发者')
+  };
 }
 
 function createUserIconDataUrl(userId: string): string {
@@ -86,99 +130,168 @@ function createUserIconDataUrl(userId: string): string {
   return canvas.toDataURL('image/png');
 }
 
+async function queryUserInfoByUsername(username: string): Promise<Record<string, unknown> | null> {
+  const runtimeConfig = getRuntimeConfig();
+  const leanCloud = getLeanCloud();
+  const cql = `select * from ${runtimeConfig.leancloud.userInfoClass} where username = ?`;
+  const result = await leanCloud.Query.doCloudQuery(cql, [username]) as CloudQueryResult;
+  return result.results?.[0]?.attributes || null;
+}
+
+async function buildDirectProfile(
+  currentUser: InstanceType<typeof AV.User>,
+  token: string
+): Promise<AuthProfile> {
+  const username = String(currentUser.get('username') || '');
+  const role = getRoleFromAuthValue(currentUser.get('auth'));
+  const userInfo = username ? await queryUserInfoByUsername(username).catch(() => null) : null;
+  const avatar = userInfo?.usericon ? String(userInfo.usericon) : defaultAvatar;
+  const intro =
+    userInfo?.intro && String(userInfo.intro).trim() !== ''
+      ? String(userInfo.intro)
+      : role === 'admin' ? '超级用户' : '开发者';
+
+  return {
+    token,
+    role,
+    name: username,
+    avatar,
+    intro
+  };
+}
+
+async function fetchCloudProfile(
+  currentUser: InstanceType<typeof AV.User>,
+  token: string
+): Promise<AuthProfile> {
+  if (!shouldUseCloudFunctions()) {
+    return buildDirectProfile(currentUser, token);
+  }
+
+  try {
+    const response = await runLeanCloudFunction<CurrentProfileResponse>('auth:getCurrentProfile');
+    return normalizeProfileResponse(response, token);
+  } catch (error) {
+    console.warn('LeanCloud cloud-profile fallback to direct profile:', error);
+    return buildDirectProfile(currentUser, token);
+  }
+}
+
+async function fetchAuthoritativeProfile(
+  token: string,
+  currentUser?: InstanceType<typeof AV.User> | null
+): Promise<AuthProfile> {
+  const authenticatedUser = currentUser || await getCurrentLeanCloudUser();
+  if (!authenticatedUser) {
+    throw new ServiceError('登录状态已失效，请重新登录', 'AUTH_SESSION_EXPIRED');
+  }
+
+  return fetchCloudProfile(authenticatedUser, token);
+}
+
 async function saveUserInfoRecord(payload: RegisterPayload): Promise<void> {
-  const AV = getLeanCloud();
-  const UserInfo = AV.Object.extend(runtimeConfig.leancloud.userInfoClass);
+  const runtimeConfig = getRuntimeConfig();
+  const leanCloud = getLeanCloud();
+  const UserInfo = leanCloud.Object.extend(runtimeConfig.leancloud.userInfoClass);
   const record = new UserInfo();
 
   await record.save({
     username: payload.username,
-    password: payload.password,
     job: payload.work,
     title: payload.level,
     usericon: createUserIconDataUrl(payload.username)
   });
 }
 
+export function getTestAuthProfile(token: string | null): AuthProfile | null {
+  const runtimeConfig = getRuntimeConfig();
+  if (!runtimeConfig.auth.allowTestTokens || !token) {
+    return null;
+  }
+
+  return TEST_SESSION_PROFILES[token] || null;
+}
+
 export const authService = {
   async login(payload: LoginPayload): Promise<CurrentUserSummary> {
     try {
-      const AV = getLeanCloud();
-      const user = await AV.User.logIn(payload.username.trim(), payload.password);
-      const userJson = user.toJSON();
-      const role = getRoleFromAuthValue(userJson.auth);
-      const token = getTokenFromRole(role);
+      const runtimeConfig = getRuntimeConfig();
+      const leanCloud = getLeanCloud();
+      const user = await leanCloud.User.logIn(payload.username.trim(), payload.password);
+      const token = buildSessionToken(user);
 
       setToken(token, runtimeConfig.auth.tokenTtlMinutes);
+      const profile = await fetchAuthoritativeProfile(token, user);
 
       return {
-        username: userJson.username,
-        role
+        username: profile.name,
+        role: profile.role
       };
     } catch (error) {
+      removeToken();
+      await getLeanCloud().User.logOut().catch(() => undefined);
       throw normalizeServiceError(error, '账号不匹配', 'AUTH_LOGIN_FAILED');
     }
   },
 
   async register(payload: RegisterPayload): Promise<void> {
     try {
-      const AV = getLeanCloud();
-      await AV.User.signUp(payload.username, payload.password, {
+      const leanCloud = getLeanCloud();
+      await leanCloud.User.signUp(payload.username, payload.password, {
         job: payload.work,
         title: payload.level,
         auth: 'D'
       });
 
-      await saveUserInfoRecord(payload);
+      if (!shouldUseCloudFunctions()) {
+        await saveUserInfoRecord(payload);
+        return;
+      }
+
+      try {
+        await runLeanCloudFunction<{ ok: boolean }>('profile:upsertCurrentUser', {
+          work: payload.work,
+          level: payload.level
+        });
+      } catch (error) {
+        console.warn('LeanCloud profile upsert fallback to direct save:', error);
+        await saveUserInfoRecord(payload);
+      }
     } catch (error) {
       throw normalizeServiceError(error, '创建用户失败', 'AUTH_REGISTER_FAILED');
     }
   },
 
   async logout(): Promise<void> {
-    const AV = getLeanCloud();
+    const leanCloud = getLeanCloud();
     removeToken();
-    await AV.User.logOut();
+    await leanCloud.User.logOut().catch(() => undefined);
+  },
+
+  async fetchCurrentProfile(): Promise<AuthProfile> {
+    const token = getToken();
+    const testProfile = getTestAuthProfile(token);
+    if (testProfile) {
+      return testProfile;
+    }
+
+    if (!token) {
+      throw new ServiceError('登录状态已失效，请重新登录', 'AUTH_TOKEN_MISSING');
+    }
+
+    try {
+      return await fetchAuthoritativeProfile(token);
+    } catch (error) {
+      throw normalizeServiceError(error, '获取当前用户信息失败', 'AUTH_PROFILE_FAILED', true);
+    }
   },
 
   async fetchCurrentUserAvatar(): Promise<string | undefined> {
     try {
-      const AV = getLeanCloud();
-      const currentUser = AV.User.current();
-      if (!currentUser) {
-        return undefined;
-      }
-
-      const username = currentUser.get('username');
-      const cql = `select * from ${runtimeConfig.leancloud.userInfoClass} where username = ?`;
-      const result = await AV.Query.doCloudQuery(cql, [username]) as any;
-      const firstRecord = result.results[0];
-
-      return firstRecord?.attributes?.usericon;
+      const profile = await this.fetchCurrentProfile();
+      return profile.avatar;
     } catch (error) {
       throw normalizeServiceError(error, '获取用户头像失败', 'AUTH_AVATAR_FAILED', true);
     }
-  },
-
-  getProfileByToken(token: string | null): AuthProfile {
-    if (!token) {
-      throw new ServiceError('GetUserInfo: token is undefined!', 'AUTH_TOKEN_MISSING');
-    }
-
-    const profile = TOKEN_PROFILES[token];
-    if (!profile) {
-      throw new ServiceError('GetUserInfo: token is invalid!', 'AUTH_TOKEN_INVALID');
-    }
-
-    return profile;
-  },
-
-  getCurrentProfile(): AuthProfile | null {
-    const token = getToken();
-    if (!token) {
-      return null;
-    }
-
-    return TOKEN_PROFILES[token] || null;
   }
 };

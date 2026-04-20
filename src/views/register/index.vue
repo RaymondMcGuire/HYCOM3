@@ -162,36 +162,39 @@ export default defineComponent({
     },
     async handleRegister() {
       const form = this.$refs.registerForm as FormInstance | undefined
-      if (!form) {
+      if (!form || this.loading) {
         return
       }
 
       try {
         await form.validate()
       } catch {
+        uiFeedback.warning('请先完善注册信息并修正表单错误。')
         return
       }
 
       this.loading = true
-      authService.register({
-        username: this.registerForm.username,
-        password: this.registerForm.password,
-        work: this.registerForm.work,
-        level: this.registerForm.level
-      })
-        .then(() => {
-          this.loading = false
-          uiFeedback.success('创建用户成功!')
-          this.registerForm.username = ''
-          this.registerForm.password = ''
-          this.registerForm.level = ''
-          this.registerForm.work = ''
-          this.registerForm.confirm_password = ''
+
+      try {
+        await authService.register({
+          username: this.registerForm.username,
+          password: this.registerForm.password,
+          work: this.registerForm.work,
+          level: this.registerForm.level
         })
-        .catch((error: ServiceError) => {
-          this.loading = false
-          uiFeedback.error(error.message || '创建用户失败!')
-        })
+        uiFeedback.success('注册成功，可以返回登录。')
+        this.registerForm.username = ''
+        this.registerForm.password = ''
+        this.registerForm.level = ''
+        this.registerForm.work = ''
+        this.registerForm.confirm_password = ''
+      } catch (error) {
+        uiFeedback.error(
+          error instanceof ServiceError ? error.message || '注册失败，请稍后重试。' : '注册失败，请稍后重试。'
+        )
+      } finally {
+        this.loading = false
+      }
     }
   }
 })

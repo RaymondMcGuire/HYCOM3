@@ -50,7 +50,10 @@ export const coreRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'admin_panel',
-        component: () => import(/* webpackChunkName: "admin_panel" */ '@/views/admin_panel/index.vue')
+        component: () => import(/* webpackChunkName: "admin_panel" */ '@/views/admin_panel/index.vue'),
+        meta: {
+          roles: ['admin']
+        }
       }
     ]
   }

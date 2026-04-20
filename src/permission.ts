@@ -21,6 +21,14 @@ let permissionGuardsRegistered = false
 
 NProgress.configure({ showSpinner: false })
 
+export function hasRequiredRoles(requiredRoles: string[] | undefined, currentRoles: string[]): boolean {
+  if (!requiredRoles || requiredRoles.length === 0) {
+    return true
+  }
+
+  return requiredRoles.some((role) => currentRoles.includes(role))
+}
+
 export function registerPermissionGuards(router: Router) {
   if (permissionGuardsRegistered) {
     return
@@ -42,6 +50,12 @@ export function registerPermissionGuards(router: Router) {
           uiFeedback.error(String(error || 'Verification failed, please login again'))
           return `/login?redirect=${to.path}`
         }
+      }
+
+      const requiredRoles = Array.isArray(to.meta.roles) ? to.meta.roles : []
+      if (!hasRequiredRoles(requiredRoles, sessionState.roles)) {
+        uiFeedback.error('无权限访问该页面')
+        return { path: '/' }
       }
 
       return true

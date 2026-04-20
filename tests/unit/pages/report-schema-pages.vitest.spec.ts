@@ -59,5 +59,15 @@ describe('report schema migrations', () => {
     }))
     expect(vm.definition.formatResult?.(result)).toBe('PMF下泄量Q=14291.74')
     expect(vm.mavEditorConfig.value).toContain('PMF工况下泄量 $Q=14291.74 m^3/s$,满足要求')
+
+    vm.mavEditorConfig.value = '<p>手动改过的计算书</p>'
+
+    await vm.definition.execute({
+      input: vm.formState,
+      setResult: () => {}
+    })
+
+    expect(vm.mavEditorConfig.value).toContain('PMF工况下泄量 $Q=14291.74 m^3/s$,满足要求')
+    expect(vm.mavEditorConfig.value).not.toContain('手动改过的计算书')
   })
 })

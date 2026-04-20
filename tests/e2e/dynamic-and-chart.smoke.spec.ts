@@ -5,7 +5,7 @@ const tokenKey = 'hycom3.0'
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(([key, ttl]) => {
     localStorage.setItem(key, JSON.stringify({
-      value: 'developer-token',
+      value: 'lc-test-session:developer',
       expiry: Date.now() + ttl
     }))
   }, [tokenKey, 60 * 60 * 1000])
@@ -80,4 +80,33 @@ test('report calculator demo still works', async ({ page }) => {
   const result = page.locator('textarea[readonly]')
   await expect(result).toHaveValue(/PMF下泄量Q=14291\.74/)
   await expect(page.locator('#mav-editor')).toContainText(/PMF工况下泄量/)
+
+  await page.getByRole('button', { name: '编辑' }).click()
+
+  const reportEditor = page.locator('#mav-editor textarea').first()
+  const originalReport = await reportEditor.inputValue()
+  await expect(reportEditor).toHaveValue(/PMF工况下泄量/)
+
+  await reportEditor.evaluate((element) => {
+    const textarea = element as HTMLTextAreaElement
+    textarea.focus()
+    textarea.selectionStart = textarea.selectionEnd = textarea.value.length
+  })
+  await reportEditor.type('\n<p>手动追加内容</p>')
+
+  const updatedReport = await reportEditor.inputValue()
+  expect(updatedReport.startsWith(originalReport)).toBe(true)
+  expect(updatedReport).toContain('手动追加内容')
+
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: '下载PDF' }).click()
+  const download = await downloadPromise
+
+  await expect.poll(async () => download.suggestedFilename()).toContain('计算书')
+  await expect.poll(async () => download.suggestedFilename()).toContain('.pdf')
+  await expect.poll(async () => await download.failure()).toBeNull()
+
+  await page.getByRole('button', { name: '计算' }).click()
+  await expect(reportEditor).toHaveValue(/PMF工况下泄量/)
+  await expect(reportEditor).not.toHaveValue(/手动追加内容/)
 })

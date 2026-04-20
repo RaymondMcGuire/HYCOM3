@@ -101,6 +101,7 @@ export default defineComponent({
     bottom: 0;
     left: 0;
     z-index: 1001;
+    background-color: var(--layout-sidebar-bg);
     overflow: hidden;
   }
 

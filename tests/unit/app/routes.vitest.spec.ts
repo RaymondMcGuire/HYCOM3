@@ -31,6 +31,7 @@ describe('app/router/routes', () => {
       'guide',
       'admin_panel'
     ])
+    expect(rootRoute?.children?.find((route) => route.path === 'admin_panel')?.meta?.roles).toEqual(['admin'])
   })
 
   it('keeps section navigation metadata intact', () => {

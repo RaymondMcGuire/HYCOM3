@@ -3,46 +3,47 @@
 ## 项目概况
 
 - 项目名称：`HYCOM3`
-- 当前目标：在不改动核心水力学公式行为的前提下，先完成运行环境和构建链现代化，让项目能在较新的前端工具链下稳定安装、启动和构建。
-- 代码库类型：已有项目，无现成 `PROJECT_CONTEXT.md`，本文件为首次补建。
+- 当前目标：在不改动核心水力学公式行为的前提下，完成 Web 发布硬化，并把 LeanCloud 收敛为当前阶段的后端边界。
+- 业务核心：`src/hycom_lib` 与 `src/shared/calculations` 负责本地水力学公式计算，页面层负责参数录入、图表与结果展示。
 
 ## 当前架构判断
 
-- 前端框架：Vue 2 class-style 组件体系，大量页面使用 `vue-property-decorator`。
-- UI 组件库：Element UI。
-- 路由/状态：`vue-router@3` + `vuex@3` + `vuex-module-decorators`。
-- 构建链现状：Vue CLI 3 + webpack 4，Electron 13 仍保留在仓库中，但当前主要业务价值在前端页面和本地公式计算。
-- 业务核心：`src/hycom_lib` 为核心计算库，页面层以参数表单、图表、表格和结果展示为主。
+- 前端框架：`Vue 3`
+- 构建链：`Vite 6`
+- 路由/状态：`vue-router 4` + `Pinia`
+- UI 组件库：`Element Plus`
+- 测试链：`Vitest + Playwright`
 - 外部服务：
-  - LeanCloud：登录、注册、管理员数据表、反馈表。
-  - EmailJS：意见反馈发送。
+  - LeanCloud：登录、注册、当前用户资料、管理员数据读取、反馈数据存储
+  - EmailJS：意见反馈邮件发送
 
-## 架构决策
+## 当前架构决策
 
-- 认证方案：沿用 LeanCloud 用户体系，当前不自建后端。
-- API 设计规范：本阶段不新增自建 API，只保留现有第三方服务接入。
-- 数据存储：LeanCloud 外部表结构暂不变更，当前仓库无本地数据库。
-- 数据迁移：本阶段无数据库迁移。
-- API Contract：当前阶段不生成 OpenAPI；后续如拆出独立后端再补。
-- 代码风格约定：
-  - 保持 `src/hycom_lib` 作为领域计算层。
-  - UI/路由层允许在迁移期继续使用 Vue 2 组件写法。
-  - 构建层优先迁移到 Vite，避免继续扩大 Vue CLI / webpack 依赖面。
+- 继续保持 Web 主线优先，桌面端暂不进入本轮实现。
+- 继续使用 LeanCloud，不新增自建后端。
+- 前端环境变量只负责配置注入，不作为安全边界。
+- 角色和管理员权限统一收口到 LeanCloud Cloud Functions。
+- 当前沿用 `_User.auth` 字段区分角色：
+  - `S` -> admin
+  - `D` -> developer
 
-## 本轮改造边界
+## 本轮实现边界
 
 - 做：
-  - 将 Web 运行入口切到 Vite。
-  - 保留 Vue 2.7 桥接路线，避免一次性重写大量计算页面。
-  - 清理旧的 Service Worker 注入方式，降低缓存污染风险。
-  - 明确 Node/npm 运行基线与启动方式。
+  - 去掉前端代码中的真实默认密钥。
+  - 启动时校验 LeanCloud 必填配置。
+  - 将当前用户资料、管理员列表与反馈列表切到 Cloud Functions。
+  - 管理页路由增加角色守卫。
+  - 注册流程不再把明文密码写入 `UsrInfo`。
+  - 清理旧的 API/request 残留链路。
+  - 补充与当前真实栈一致的 README 和 LeanCloud 云函数示例。
 - 不做：
-  - 不在本轮把全部页面重写为 Vue 3 Composition API。
-  - 不在本轮重构 `src/hycom_lib` 公式实现。
-  - 不在本轮完成 Electron 新架构迁移。
+  - 不重写 `src/hycom_lib` 公式实现。
+  - 不做桌面端主进程、预加载和打包。
+  - 不将反馈写入流程整体迁移到云函数。
 
 ## 风险记录
 
-- Vue 2 与 Element UI 都已进入维护尾声，后续仍需规划 Vue 3 + Element Plus 的第二阶段迁移。
-- Electron 构建链仍是旧栈，若要恢复桌面打包，需要单独做主进程/预加载/安全模型改造。
-- LeanCloud 与 EmailJS 密钥目前仍在前端代码中，后续应迁入环境变量或运行时配置。
+- 只要配置注入到浏览器，客户端凭据就不是秘密，因此权限必须依赖 LeanCloud 后端规则而不是前端隐藏变量。
+- Cloud Functions 需要在 LeanCloud 控制台或 Cloud Engine 中单独部署；前端改造完成后，若云函数未部署，管理员相关能力不会工作。
+- 当前大量计算页仍使用 Options API 与较宽松的类型定义，后续仍需逐步收敛 `any` 与超大组件。

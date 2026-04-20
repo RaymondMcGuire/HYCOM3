@@ -45,6 +45,7 @@
         <el-button
           type="primary"
           class="auth-button auth-button--primary"
+          :loading="loading"
           @click="handleLogin"
         >
           登录
@@ -123,23 +124,28 @@ export default defineComponent({
     },
     async handleLogin() {
       const form = this.$refs.loginForm as FormInstance | undefined
-      if (!form) {
+      if (!form || this.loading) {
         return
       }
 
       try {
         await form.validate()
-        this.loading = true
-        const session = await authService.login(this.loginForm)
-        uiFeedback.success(`欢迎用户 ${session.username} 使用HYCOM3.0！`)
-        this.loading = false
+      } catch {
+        uiFeedback.warning('请先输入有效的用户名和密码。')
+        return
+      }
+
+      this.loading = true
+
+      try {
+        await authService.login(this.loginForm)
+        uiFeedback.success('登录成功，正在进入系统。')
         this.$router.push({ path: this.redirect || '/' })
       } catch (error) {
-        if (!(error instanceof ServiceError)) {
-          return
-        }
-
-        uiFeedback.error(error.message || '账号不匹配')
+        uiFeedback.error(
+          error instanceof ServiceError ? error.message || '登录失败，请稍后重试。' : '登录失败，请稍后重试。'
+        )
+      } finally {
         this.loading = false
       }
     }

@@ -27,9 +27,11 @@
       <div class="editor-toolbar__cell">
         <el-button
           type="primary"
+          :loading="exportingPdf"
+          :disabled="exportingPdf"
           @click="onHtml2PDF"
         >
-          生成PDF
+          下载PDF
         </el-button>
       </div>
     </app-grid>
@@ -44,12 +46,12 @@
     >
       <div v-if="showEditor">
         <el-input
-          :value="renderSource"
+          :model-value="draftValue"
           class="editor-input"
           type="textarea"
           :rows="24"
           resize="vertical"
-          @input="onInput"
+          @update:model-value="onInput"
         />
       </div>
 
@@ -57,7 +59,7 @@
         <div
           ref="preview"
           class="preview-panel"
-          v-html="renderSource"
+          v-html="currentContent"
         />
       </div>
     </app-grid>
@@ -70,6 +72,7 @@ import { defineComponent } from 'vue'
 import { browserPdfExportAdapter } from '@/integrations/pdf/adapter'
 import { renderByMathjax } from '@/plugins/mathjax'
 import AppGrid from '@/shared/components/layout/AppGrid.vue'
+import { uiFeedback } from '@/shared/ui/uiFeedback'
 
 export default defineComponent({
   name: 'MavEditor',
@@ -84,12 +87,17 @@ export default defineComponent({
   },
   data() {
     return {
+      draftValue: String((this.config && this.config.value) || ''),
+      exportingPdf: false,
       syncTimer: null as number | null
     }
   },
   computed: {
     renderSource(): string {
       return String((this.config && this.config.value) || '')
+    },
+    currentContent(): string {
+      return this.draftValue
     },
     showEditor(): boolean {
       return Boolean(this.config?.subfield) || this.config?.defaultOpen !== 'preview'
@@ -100,6 +108,11 @@ export default defineComponent({
   },
   watch: {
     renderSource() {
+      if (this.renderSource !== this.draftValue) {
+        this.draftValue = this.renderSource
+      }
+    },
+    currentContent() {
       this.schedulePreviewSync()
     },
     showEditor() {
@@ -142,11 +155,24 @@ export default defineComponent({
       }
     },
     onInput(value: string) {
+      this.draftValue = value
       this.config.value = value
-      this.schedulePreviewSync()
     },
     async onHtml2PDF() {
-      await browserPdfExportAdapter.generatePdf(this.renderSource, this.config)
+      if (this.exportingPdf) {
+        return
+      }
+
+      this.exportingPdf = true
+
+      try {
+        await this.$nextTick()
+        await browserPdfExportAdapter.generatePdf(this.currentContent, this.config)
+      } catch (error) {
+        uiFeedback.error(error instanceof Error ? error.message : '下载 PDF 失败')
+      } finally {
+        this.exportingPdf = false
+      }
     },
     onMavEdit() {
       this.config.defaultOpen = ''

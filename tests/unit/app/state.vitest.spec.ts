@@ -35,11 +35,18 @@ describe('app/state facades', () => {
 
   it('reads and clears session state through the facade', async () => {
     const sessionState = useSessionState()
+    vi.spyOn(authService, 'fetchCurrentProfile').mockResolvedValue({
+      token: 'lc-user-session',
+      role: 'developer',
+      name: '开发者',
+      avatar: 'avatar.png',
+      intro: '开发者'
+    })
 
-    setToken('developer-token', 60)
+    setToken('lc-user-session', 60)
     await sessionState.fetchProfile()
 
-    expect(sessionState.token).toBe('developer-token')
+    expect(sessionState.token).toBe('lc-user-session')
     expect(sessionState.name).toBe('开发者')
     expect(sessionState.roles).toEqual(['developer'])
 
@@ -51,8 +58,15 @@ describe('app/state facades', () => {
   it('delegates logout to the underlying auth service', async () => {
     const sessionState = useSessionState()
     const logoutSpy = vi.spyOn(authService, 'logout').mockResolvedValue()
+    vi.spyOn(authService, 'fetchCurrentProfile').mockResolvedValue({
+      token: 'lc-user-session',
+      role: 'developer',
+      name: '开发者',
+      avatar: 'avatar.png',
+      intro: '开发者'
+    })
 
-    setToken('developer-token', 60)
+    setToken('lc-user-session', 60)
     await sessionState.fetchProfile()
     await sessionState.logout()
 

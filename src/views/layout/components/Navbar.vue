@@ -40,7 +40,7 @@
             <el-dropdown-item> 操作指南 </el-dropdown-item>
           </router-link>
 
-          <div v-if="usrname === '超级用户'">
+          <div v-if="roles.includes('admin')">
             <router-link
               class="inlineBlock"
               to="/admin_panel"
@@ -64,7 +64,6 @@
 import { defineComponent } from 'vue'
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Hamburger from '@/components/Hamburger/index.vue'
-import { authService } from '@/services/authService'
 import { useLayoutState, useSessionState } from '@/app/state'
 
 const layoutState = useLayoutState()
@@ -76,17 +75,12 @@ export default defineComponent({
     Breadcrumb,
     Hamburger
   },
-  data() {
-    return {
-      usricon: ''
-    }
-  },
   computed: {
     sidebar() {
       return layoutState.sidebar
     },
     avatar(): string {
-      return this.usricon || sessionState.avatar
+      return sessionState.avatar
     },
     usrname(): string {
       return sessionState.name
@@ -95,22 +89,9 @@ export default defineComponent({
       return sessionState.roles
     }
   },
-  created() {
-    void this.fetchUsrIcon()
-  },
   methods: {
     toggleSideBar() {
       void layoutState.toggleSideBar(false)
-    },
-    async fetchUsrIcon() {
-      try {
-        const avatar = await authService.fetchCurrentUserAvatar()
-        if (avatar) {
-          this.usricon = avatar
-        }
-      } catch (error) {
-        console.log(error)
-      }
     },
     logout() {
       sessionState.logout().then(() => {

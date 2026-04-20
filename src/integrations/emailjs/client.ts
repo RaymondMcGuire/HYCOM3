@@ -1,5 +1,5 @@
 import emailjs from 'emailjs-com';
-import { runtimeConfig } from '@/app/config/runtime';
+import { getEnabledEmailConfig } from '@/app/config/runtime';
 
 export interface EmailFeedbackPayload {
   title: string;
@@ -9,14 +9,15 @@ export interface EmailFeedbackPayload {
 }
 
 export async function sendFeedbackEmail(payload: EmailFeedbackPayload): Promise<void> {
-  if (!runtimeConfig.emailjs.enabled) {
+  const config = getEnabledEmailConfig();
+  if (!config) {
     return;
   }
 
   await emailjs.send(
-    runtimeConfig.emailjs.serviceId,
-    runtimeConfig.emailjs.templateId,
+    config.serviceId,
+    config.templateId,
     payload,
-    runtimeConfig.emailjs.publicKey
+    config.publicKey
   );
 }

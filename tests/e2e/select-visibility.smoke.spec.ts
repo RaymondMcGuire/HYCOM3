@@ -24,7 +24,7 @@ const schemaSelectCases: SchemaSelectCase[] = [
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(([key, ttl]) => {
     localStorage.setItem(key, JSON.stringify({
-      value: 'developer-token',
+      value: 'lc-test-session:developer',
       expiry: Date.now() + ttl
     }))
   }, [tokenKey, 60 * 60 * 1000])
